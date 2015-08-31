@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<title><?php echo hmtNMG;?></title>
+	<?php $SRC = RECRUIT_SRC; ?>
+	<script type="text/javascript" src="{$SRC}/scripts/jquery.min.js"></script>
+	<script type="text/javascript" src="{$SRC}/scripts/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="{$SRC}/css/bootstrap.min.css">
+	<style>
+
+		body{
+		 font-family: 'microsoft yahei',Arial,sans-serif;
+		 margin:0;
+		 padding:0;
+		}
+
+		.is-Overflow {  
+		  overflow: auto;  
+		} 
+
+	</style>
+</head>
+<body>
+
+    <div id="loginModal" class="modal show is-Overflow">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <!-- <button type="button" class="close">x</button> -->
+            <h1 class="text-center text-primary">登录</h1>
+          </div>
+          <div class="modal-body">
+            <form class="form col-md-12 center-block" action="{:U('Recruit/Resume/login')}" method="post">
+              <div class="form-group">
+                <input type="text" class="form-control input-lg" id="stu_id" name="stu_id" placeholder="学号" required>
+
+                <input type="text" class="form-control input-lg" id="phone" name="phone" placeholder="手机号" required>
+
+                <input type="number" class="form-control input-lg" id="cv_flag" name="cv_flag" min="1001" max="9999" step="1" placeholder="简历id  (4位数字)" required>
+              </div>
+              <div class="form-group form-inline">
+                <input type="text" class="form-control input-lg" id="" name="verify" placeholder="验证码" required>
+            	<img id="verifyImg" src="__URL__/verify/<?php echo NOW_TIME;?>" onClick="changeVerify()" title="点击刷新验证码"/>
+              </div>
+              <div class="form-group">
+                <button class="btn btn-primary btn-lg btn-block">立刻登录</button>
+                <!-- <span><a href="#">找回密码</a></span>
+                <span><a href="#" class="pull-right">注册</a></span> -->
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script language="JavaScript">
+		
+		function changeVerify(){
+			var timenow = new Date().getTime();
+			document.getElementById('verifyImg').src='__URL__/verify/'+timenow;
+		}
+	</script>
+
+</body>
+</html>
