@@ -1,7 +1,11 @@
 <?php
 namespace Recruit\Controller;
 use Think\Controller;
-class ResumeController extends Controller {
+class ResumeController extends BaseController {
+/**
+ * 简历控制器，继承BaseController
+ */
+
     public function index(){
         echo "Resume控制器";
     }
