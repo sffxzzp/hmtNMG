@@ -27,6 +27,7 @@ function pre_process_resume_data(&$temp){
 function format_sqlData_to_formData($resume){
 
 	$temp['name'] 					= $resume['name'];
+	$temp['photo'] 					= $resume['photo'];
 	$temp['gender']					= $resume['gender'];
 	$temp['birthday']				= $resume['birthday'];
 
@@ -82,6 +83,52 @@ function process_sessionInfo_to_Data(&$temp){
 	$temp['stu_id'] 		= $info['stu_id'];
 	$temp['phone']			= $info['phone'];
 	$temp['cv_flag'] 		= $info['cv_flag'];
+}
+
+
+function upload_photo($filename){
+	
+/*======================================上传照片 begin==================================*/
+    // p(I('post.'));
+    // p($_FILES);die;
+    // return $_FILES;
+
+    $photo_name = "default.jpg";// 默认的照片名
+    if($_FILES['photo']['error'] == 4){
+
+    }else{
+        $config = array(//图片上传配置
+            'maxSize'    =>    3145728,    
+            'rootPath'   =>    './Application/Recruit/Source/images',
+            'savePath'   =>    '/photo/',    
+            'saveName'   =>    $filename,
+            'exts'       =>    array('jpg', 'png', 'jpeg'),    
+            'autoSub'    =>    false,   //子目录，关闭    
+            // 'subName'    =>    array('date','Ymd'),
+            'replace'    =>    true,    //允许同名文件覆盖
+        );
+        $upload = new \Think\Upload($config);// 实例化上传类  
+        $_rst   =   $upload->uploadOne($_FILES['photo']);
+
+        if(!$_rst) {// 上传错误提示错误信息
+        	$data['errcode'] = 4;
+        	$data['errmsg'] = $upload->getError()."<br/>(￣ω￣)看来真相出问题了";
+            // $this->error($upload->getError()."<br/>(￣ω￣)看来真相出问题了");
+            // return;
+        }else{// 上传成功
+            // $photo_url = DOMAIN_URL."/hmtNMG/Application/Recruit/Source/images/".$_rst['savename'];
+            // echo $photo_url;
+            // die;
+            
+            $data['errcode'] = 0;
+            $data['errmsg'] = "ok";
+            $photo_name = $_rst['savename'];
+        }
+    }
+/*======================================上传照片 end==================================*/
+
+    $data['photo_name'] = $photo_name;
+	return $data;
 }
 
 
