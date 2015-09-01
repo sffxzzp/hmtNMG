@@ -117,6 +117,7 @@ class ResumeController extends BaseController {
     			case 1:
     				
     				session("RESUME_INFO", $info);
+                    session('RESUME_LOGIN_FLAG', true);
 
     				if (isset($resume)) {
     					// 将老用户简历信息转换成表单数据，并写cookie
@@ -219,25 +220,74 @@ class ResumeController extends BaseController {
     		    $this->error("只会开机关机也写一下啊, 干(╯°O°)╯（ ┻━┻");
     		    return;
     		}
-    		if ($temp['joined_group'] == "") {
-    		    
-    		    $this->error("没加入其它组织么? 那写个\"无\"吧┬—┬ ノ( ' - 'ノ)");
-    		    return;
-    		}
-    		if ($temp['self_assessment'] == "") {
-    		    
-    		    $this->error("自我评价都不写还想交简历(╯°Д°)╯（ ┻━┻");
-    		    return;
-    		}
+            if ($temp['joined_group'] == "") {
+                
+                $this->error("没加入其它组织么? 那写个\"无\"吧┬—┬ ノ( ' - 'ノ)");
+                return;
+            }
+            if ($temp['self_assessment'] == "") {
+                
+                $this->error("自我评价都不写还想交简历(╯°Д°)╯（ ┻━┻");
+                return;
+            }
 
-    		pre_process_resume_data($temp);// 预处理简历数据
 
-    		$info = session("RESUME_INFO");
+            $info = session("RESUME_INFO");
+            $upload_rst = upload_photo(md5($info['stu_id']));//md5加密学号作为photo名
+            // p($upload_rst);die;
+            
+            if ($upload_rst['errcode'] == 4) {
+                // 上传失败
+                $this->error($upload_rst['errmsg']);
+                return;
+            }
+
+            $temp['photo']                      = $upload_rst['photo_name'];
     		// p($info);
+        /*======================================上传照片 begin==================================*/
+            // p(I('post.'));
+            // p($_FILES);die;
+
+            // $temp['photo'] = "default.jpg";
+            // // $photo_url = null;
+            // if($_FILES['photo']['error'] == 4){
+            //     // $photo_url = null;
+            // }else{
+            //     $config = array(//图片上传配置
+            //         'maxSize'    =>    3145728,    
+            //         'rootPath'   =>    './Application/Recruit/Source/images',
+            //         'savePath'   =>    '/photo/',    
+            //         'saveName'   =>    md5($info['stu_id']),   //md5加密学号作为photo名
+            //         'exts'       =>    array('jpg', 'png', 'jpeg'),    
+            //         'autoSub'    =>    false,   //子目录，关闭    
+            //         // 'subName'    =>    array('date','Ymd'),
+            //         'replace'    =>    true,    //允许同名文件覆盖
+            //     );
+            //     $upload = new \Think\Upload($config);// 实例化上传类  
+            //     $_rst   =   $upload->uploadOne($_FILES['photo']);
+
+            //     if(!$_rst) {// 上传错误提示错误信息
+            //         $this->error($upload->getError()."<br/>(￣ω￣)看来真相出问题了");
+            //         return;
+            //     }else{// 上传成功
+            //         // $photo_url = DOMAIN_URL."/hmtNMG/Application/Recruit/Source/images/".$_rst['savename'];
+            //         // echo $photo_url;
+            //         // die;
+                    
+            //         $temp['photo'] = $_rst['savename'];
+            //     }
+            // }
+        /*======================================上传照片 end==================================*/
+
+            pre_process_resume_data($temp);// 预处理简历数据
+
     		
     		// 组装写入数据库的简历信息
     		$resume['name'] 					= $temp['name'];
-    		$resume['gender'] 					= $temp['gender'];
+    		if ($temp['photo'] != "default.jpg") {// 非默认，只有上传成功才需要更新
+                $resume['photo'] 				= $temp['photo'];
+            }
+            $resume['gender']                   = $temp['gender'];
     		$resume['birthday']				 	= $temp['birthday'];
     		$resume['birth_place']			 	= $temp['province'] ."省".$temp['city']."市";
     		$resume['race'] 					= $temp['race'];
@@ -288,7 +338,7 @@ class ResumeController extends BaseController {
 
 				cookie($info['stu_id']."_RESUME_INFO", json_encode($temp, JSON_UNESCAPED_UNICODE));
 
-				$this->success($tips."成功"."<br/>┬—┬ ノ( ' - 'ノ)简历投递截止前仍可以修改简历哦");
+				$this->success($tips."成功"."<br/>┬—┬ ノ( ' - 'ノ)简历投递截止前仍可以修改简历哦", U('Recruit/Resume/edit'), 3);
     		}else {
 
     			$this->error($tips."失败: ".$resume_model->getError()."<br/>(╯°O°)╯（ ┻━┻再来一次");
@@ -302,12 +352,7 @@ class ResumeController extends BaseController {
     		// die;
     		if (!session('RESUME_LOGIN_FLAG')) {
     			
-	    		if (strcmp($_SERVER['HTTP_REFERER'], DOMAIN_URL.U('Recruit/Resume/login')) != 0) {
-	    			// 限制来源只能是login.html
-	    			redirect(U('Recruit/Resume/login'));
-	    		}else{
-	    			session('RESUME_LOGIN_FLAG', true);
-	    		}
+    			redirect(U('Recruit/Resume/login'));
     		}else{
 
     			// p(session());
@@ -326,19 +371,21 @@ class ResumeController extends BaseController {
 
     	if (IS_AJAX) {
     		
-			// $this->ajaxReturn(I('post.'), 'json');
+   //          $data['post'] = I('post.');
+   //          $data['file'] = $_FILES;
+			// $this->ajaxReturn($data, 'json');
 			// return;
 
     		$temp = I('post.');
-    		unset($temp['verify']);// 去除验证码字段
-    		
-    		pre_process_resume_data($temp);// 预处理
-    		process_sessionInfo_to_Data($temp);// session里的简历标识数据->覆盖->简历cookie数据
+            unset($temp['verify']);// 去除验证码字段
 
-    		// p($temp);die;
+            pre_process_resume_data($temp);// 预处理
+            process_sessionInfo_to_Data($temp);// session里的简历标识数据->覆盖->简历cookie数据
 
-    		// $this->ajaxReturn($temp, 'json');
-    		// return;
+            // p($temp);die;
+
+            // $this->ajaxReturn($temp, 'json');
+            // return;
 
 			cookie($temp['stu_id']."_RESUME_INFO", json_encode($temp, JSON_UNESCAPED_UNICODE));
 			$this->ajaxReturn(true, 'json');
