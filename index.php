@@ -12,12 +12,12 @@
     
     define('DOMAIN_URL', "http://127.0.0.1");//服务器域名
 
-    define('PUBLIC_URL', '/hmtNMG/Application/Public');//Public公共文件夹路径
+    // define('PUBLIC_URL', '/hmtNMG/Application/Public');//Public公共文件夹路径
     
     define('RECRUIT_SRC', '/hmtNMG/Application/Recruit/Source');// Recruit资源文件夹路径
 
-    define('RECRUIT_TITLE', '[招新]简历填写系统');
-    define('NMG', '红满堂网络维护组(HMT Network Maintenance Group)');
+    define('RECRUIT_TITLE', '招新系统');
+    define('hmtNMG', '红满堂网络维护组(HMT Network Maintenance Group)');
 
     require THINK_PATH.'ThinkPHP.php'
 
