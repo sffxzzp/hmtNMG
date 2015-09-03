@@ -130,9 +130,13 @@ class ResumeController extends BaseController {
 						cookie($temp['stu_id']."_RESUME_INFO", json_encode($temp, JSON_UNESCAPED_UNICODE));
     				}else {
 
-                        $temp['photo'] = "default.jpg";// 新用户，加上默认头像;
-                        // (老用户不用，因为老用户一定得上传了图片才能成为老用户[即写数据库]，不管上传的图片是不是default.jpg)
-                        cookie($info['stu_id']."_RESUME_INFO", json_encode($temp, JSON_UNESCAPED_UNICODE));
+                        if (!cookie($info['stu_id']."_RESUME_INFO")) {
+                            // 不存在cookie数据的话
+                            
+                            $temp['photo'] = "default.jpg";// 新用户，加上默认头像;
+                            // (老用户不用，因为老用户一定得上传了图片才能成为老用户[即写数据库]，不管上传的图片是不是default.jpg)
+                            cookie($info['stu_id']."_RESUME_INFO", json_encode($temp, JSON_UNESCAPED_UNICODE));
+                        }
                     }
 
                     // p(cookie());die;
