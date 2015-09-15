@@ -58,4 +58,38 @@ function validate_cv_flag($cv_flag){
 	}
 }
 
+/**
+ * 格式化数据库内简历数据->简历表单数据
+ * @param  mix $resume 数据库内简历数据
+ * @return mix         简历表单数据
+ */
+function format_sqlData_to_formData($resume){
+
+	$birth_place = explode('省', $resume['birth_place']);
+	$province = $birth_place[0];
+	// p($birth_place);
+	$birth_place = explode('市', $birth_place[1]);
+	$city = $birth_place[0];
+	// p($birth_place);
+	$resume['province']				= $province;
+	$resume['city']					= $city;
+
+	$address = explode('区', $resume['address']);
+	$district = $address[0];
+	// p($address);
+	$address = explode('栋', $address[1]);
+	$building = $address[0];
+	// p($address);
+	$address = explode('房', $address[1]);
+	$room = $address[0];
+	// p($address);
+	$resume['district']				= $district;
+	$resume['building']				= $building;
+	$resume['room']					= $room;
+	
+	$resume['free_time']			= explode(',', $resume['free_time']);
+
+	return $resume;
+}
+
 ?>
