@@ -42,7 +42,7 @@
               </div>
               <div class="form-group form-inline">
                 <input type="text" class="form-control input-lg" id="" name="verify" placeholder="验证码" required>
-            	<img id="verifyImg" src="__URL__/verify/<?php echo NOW_TIME;?>" onClick="changeVerify()" title="点击刷新验证码"/>
+            	<img id="verifyImg" src="__APP__/Recruit/Ver/verify/<?php echo NOW_TIME;?>" onClick="changeVerify()" title="点击刷新验证码"/>
               </div>
               <div class="form-group">
                 <button class="btn btn-primary btn-lg btn-block">立刻登录</button>
@@ -62,7 +62,7 @@
 		
 		function changeVerify(){
 			var timenow = new Date().getTime();
-			document.getElementById('verifyImg').src='__URL__/verify/'+timenow;
+			document.getElementById('verifyImg').src='__APP__/Recruit/Ver/verify/'+timenow;
 		}
 	</script>
 
