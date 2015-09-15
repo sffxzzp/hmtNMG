@@ -155,7 +155,6 @@ class ResumeController extends BaseController {
     }
 
     public function edit(){
-    	// $this->show("1234");
 
     	if (IS_POST) {
 
@@ -243,60 +242,35 @@ class ResumeController extends BaseController {
 
 
             $info = session("RESUME_INFO");
-            $upload_rst = upload_photo(md5($info['stu_id']));//md5加密学号作为photo名
-            // p($upload_rst);die;
-            
-            if ($upload_rst['errcode'] == 4) {
-                // 上传失败
-                $this->error($upload_rst['errmsg']);
-                return;
+
+            if(!empty($_FILES['photo']['tmp_name'])){
+                // echo'已选择文件';
+
+                $upload_rst = upload_photo(md5($info['stu_id']));//md5加密学号作为photo名
+                if ($upload_rst['errcode'] == 4) {
+                    // 上传失败
+                    $this->error($upload_rst['errmsg']);
+                    return;
+                }
+
+                $resume['photo']                = $upload_rst['photo_name'];
+                $temp['photo']                  = $upload_rst['photo_name'];
+            }else{
+                // echo'未选择文件';
+                
+                // 取得原来的photo名
+                $old_temp = json_decode(cookie($info['stu_id']."_RESUME_INFO"),true);
+                $temp['photo']                  = $old_temp['photo'];
             }
-
-            $temp['photo']                      = $upload_rst['photo_name'];
-    		// p($info);
-        /*======================================上传照片 begin==================================*/
-            // p(I('post.'));
-            // p($_FILES);die;
-
-            // $temp['photo'] = "default.jpg";
-            // // $photo_url = null;
-            // if($_FILES['photo']['error'] == 4){
-            //     // $photo_url = null;
-            // }else{
-            //     $config = array(//图片上传配置
-            //         'maxSize'    =>    3145728,    
-            //         'rootPath'   =>    './Application/Recruit/Source/images',
-            //         'savePath'   =>    '/photo/',    
-            //         'saveName'   =>    md5($info['stu_id']),   //md5加密学号作为photo名
-            //         'exts'       =>    array('jpg', 'png', 'jpeg'),    
-            //         'autoSub'    =>    false,   //子目录，关闭    
-            //         // 'subName'    =>    array('date','Ymd'),
-            //         'replace'    =>    true,    //允许同名文件覆盖
-            //     );
-            //     $upload = new \Think\Upload($config);// 实例化上传类  
-            //     $_rst   =   $upload->uploadOne($_FILES['photo']);
-
-            //     if(!$_rst) {// 上传错误提示错误信息
-            //         $this->error($upload->getError()."<br/>(￣ω￣)看来真相出问题了");
-            //         return;
-            //     }else{// 上传成功
-            //         // $photo_url = DOMAIN_URL."/hmtNMG/Application/Recruit/Source/images/".$_rst['savename'];
-            //         // echo $photo_url;
-            //         // die;
-                    
-            //         $temp['photo'] = $_rst['savename'];
-            //     }
-            // }
-        /*======================================上传照片 end==================================*/
-
+            // p($upload_rst);
+            // die;
+            
             pre_process_resume_data($temp);// 预处理简历数据
 
     		
     		// 组装写入数据库的简历信息
     		$resume['name'] 					= $temp['name'];
-    		if ($temp['photo'] != "default.jpg") {// 非默认，只有上传成功才需要更新
-                $resume['photo'] 				= $temp['photo'];
-            }
+            // $resume['photo'] 	      			= $temp['photo'];
             $resume['gender']                   = $temp['gender'];
     		$resume['birthday']				 	= $temp['birthday'];
     		$resume['birth_place']			 	= $temp['province'] ."省".$temp['city']."市";
@@ -327,6 +301,10 @@ class ResumeController extends BaseController {
 
 	    		process_sessionInfo_to_Data($resume);// session里的简历标识数据->添加->简历数据
 
+                if ($resume['photo'] == '') {// 未上传头像
+                    $resume['photo']            = "default.jpg";
+                    $temp['photo']              = "default.jpg";
+                }
 	    		// echo "add";
 	    		$rst = $resume_model->add($resume);
 	    		$tips = "简历创建";
@@ -355,19 +333,6 @@ class ResumeController extends BaseController {
     		}
 
     	}else {
-
-    		// echo DOMAIN_URL.U('Recruit/Resume/login');
-    		// p($_SERVER);
-    		// p(session());
-    		// die;
-    		if (!session('RESUME_LOGIN_FLAG')) {
-    			
-    			redirect(U('Recruit/Resume/login'));
-    		}else{
-
-    			// p(session());
-    			// p(cookie());die;
-    		}
 
 			$this->display();
     	}
@@ -404,22 +369,13 @@ class ResumeController extends BaseController {
     }
 
     /**
-     * 获取验证码
+     * 退出
      */
-    public function verify(){
-
-        // 调用function
-        // verify();
-
-        $config =    array(
-            'fontSize'    =>    15,    // 验证码字体大小
-            'useNoise'    =>    false, // 关闭验证码杂点
-            'imageW'      =>    0,     // 验证码宽度
-            'imageH'      =>    0,     // 验证码高度
-            'codeSet'     =>    '123456789',//验证码字符
-            'length'      =>    3,     // 验证码位数
-        );
-        $Verify =     new \Think\Verify($config);
-        $Verify->entry();
+    public function quit(){
+        
+        session("RESUME_INFO",null);
+        session("RESUME_LOGIN_FLAG",null);
+        
+        redirect(U("Recruit/Resume/login"));
     }
 }

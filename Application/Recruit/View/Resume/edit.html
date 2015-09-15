@@ -27,16 +27,15 @@
     <div id="editModal" class="modal show is-Overflow">
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header">
-            <!-- <button type="button" class="close">x</button> -->
             <?php $info = session('RESUME_INFO');$resume_info = json_decode(cookie($info['stu_id'].'_RESUME_INFO'), true);?>
+          <div class="modal-header">
+            <span><a href="{:U('Recruit/Resume/quit')}" class="pull-right">退出</a></span>
             <h1 class="text-center text-primary">招新简历</h1>
             <!-- 简历照片 -->
             <label for="photo" class="sr-only">Photo</label>
             <div class="text-center">
                 <img class="img-circle" id="userImg" src="{$SRC}/images/photo/{$resume_info['photo']}" alt="无图无真相" style="width:100px;height:100px" onclick="$('input[id=photo]').click();">
-                <div class="caption">
-                </div>
+
             </div>
           </div>
           <div class="modal-body">
@@ -56,7 +55,7 @@
                     <label for="" class="col-sm-2 control-label">姓名</label>
                     <div class="col-sm-10">
                       <label for="name" class="sr-only">Name</label>
-                      <input type="text" class="form-control info" id="name" name="name" value="{$resume_info['name']}" placeholder="" required>
+                      <input type="text" class="form-control" id="name" name="name" value="{$resume_info['name']}" placeholder="" required>
                     </div>
                 </div>
               
@@ -146,7 +145,7 @@
         		    <div class="col-sm-10 form-inline">
         		     <div class="input-group">
         		      <label for="race" class="sr-only">Race</label>
-        		      <input type="text" class="form-control info" id="race" name="race" value="{$resume_info['race']}" placeholder="如: 汉" required>
+        		      <input type="text" class="form-control" id="race" name="race" value="{$resume_info['race']}" placeholder="如: 汉" required>
         		      <span class="input-group-addon">族</span>
         		     </div>
         		    </div>
@@ -343,7 +342,7 @@
     	    	    <label for="" class="col-sm-2 control-label">验证码</label>
     	    	    <div class="col-sm-10">
     	    	      <input type="text" class="form-control input-lg" id="" name="verify" placeholder="验证码" required>
-    	    		  <img id="verifyImg" src="__URL__/verify/<?php echo NOW_TIME;?>" onClick="changeVerify()" title="点击刷新验证码"/>
+    	    		  <img id="verifyImg" src="__APP__/Recruit/Ver/verify/<?php echo NOW_TIME;?>" onClick="changeVerify()" title="点击刷新验证码"/>
     	    	    </div>
         	    </div>
         	    <div class="form-group">
@@ -400,7 +399,7 @@
 		
 		function changeVerify(){
 			var timenow = new Date().getTime();
-			document.getElementById('verifyImg').src='__URL__/verify/'+timenow;
+			document.getElementById('verifyImg').src='__APP__/Recruit/Ver/verify/'+timenow;
 		}
 	</script>
 
