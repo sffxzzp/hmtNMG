@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<title><?php echo hmtNMG;?></title>
+	<?php $SRC = MANAGER_SRC; ?>
+	<script type="text/javascript" src="{$SRC}/scripts/jquery.min.js"></script>
+	<script type="text/javascript" src="{$SRC}/scripts/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="{$SRC}/css/bootstrap.min.css">
+	<style>
+
+		body{
+		 font-family: 'microsoft yahei',Arial,sans-serif;
+		 margin:0;
+		 padding:0;
+		}
+
+		.is-Overflow {  
+		  overflow: auto;  
+		} 
+
+	</style>
+</head>
+<body>
+
+    <div id="loginModal" class="modal show is-Overflow">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="text-center text-primary">管理员登录</h1>
+          </div>
+          <div class="modal-body">
+            <form class="form center-block" action="{:U('Manager/User/login')}" method="post">
+              <div class="form-group">
+                <input type="text" class="form-control input-lg" id="username" name="username" value="{:I('get.username')}" placeholder="账号" required>
+
+                <input type="password" class="form-control input-lg" id="pwd" name="pwd" value="{:I('get.pwd')}" placeholder="密码" required>
+              </div>
+              <div class="form-group form-inline">
+                <input type="text" class="form-control input-lg" id="" name="verify" placeholder="验证码" required>
+            	<img id="verifyImg" src="__APP__/Manager/Ver/verify/<?php echo NOW_TIME;?>" onClick="changeVerify()" title="点击刷新验证码"/>
+              </div>
+              <div class="form-group">
+                <button class="btn btn-primary btn-lg btn-block">立即登录</button>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script language="JavaScript">
+		
+		function changeVerify(){
+			var timenow = new Date().getTime();
+			document.getElementById('verifyImg').src='__APP__/Manager/Ver/verify/'+timenow;
+		}
+	</script>
+
+</body>
+</html>
