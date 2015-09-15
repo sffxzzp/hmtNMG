@@ -29,11 +29,14 @@ class UserController extends BaseController {
     			return;
     		}
 
+            // p(I('post.'));
     		$login_data['username'] = $temp['username'];
     		$login_data['password'] = md5($temp['pwd']);
 
+            // p($login_data);die;
+
     		$model = M('district_admin');
-    		if (($user_data = $model->where($login_data)->find()) === false) {
+    		if (!$user_data = $model->where($login_data)->find()) {
     			$this->error("账号或密码不正确！");
     			return;
     		}
