@@ -10,6 +10,8 @@ class BaseController extends CommonController {
     
 	protected function _initialize(){
 
+		parent::_initialize();
+
 		// session('MANAGER_LOGIN_FLAG',null);
 
 		$CUR_ASK_FROM = strtolower(MODULE_NAME."/".CONTROLLER_NAME."/".ACTION_NAME);
