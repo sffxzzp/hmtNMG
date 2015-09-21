@@ -142,7 +142,21 @@ class ResumeController extends BaseController {
                     // p(cookie());die;
     				// p($log);die;
 
-    				$this->success("登录成功", U('Recruit/Resume/edit'));
+                    switch (self::$RECRUIT_STAGE) {
+                        case 0:
+                            $target_URL = U('Recruit/Resume/edit');
+                            break;
+                        case 1:
+                        case 2:
+                        case 3:
+                            $target_URL = U('Recruit/Resume/status');
+                            break;
+                        default:// 不可能执行这里
+                            $target_URL = '#';
+                            break;
+                    }
+
+    				$this->success("登录成功", $target_URL);
     				break;
     			default:
     				break;
@@ -155,6 +169,12 @@ class ResumeController extends BaseController {
     }
 
     public function edit(){
+
+        if (self::$RECRUIT_STAGE != 0) {
+            $this->error("当前: \"".self::$RECRUIT_STAGE_INFO."\"".
+                "<br/ >只有 \"".self::RECRUIT_STAGE_0_INFO."\" 才能更新简历！");
+            return;
+        }
 
     	if (IS_POST) {
 
@@ -306,7 +326,12 @@ class ResumeController extends BaseController {
                     $temp['photo']              = "default.jpg";
                 }
 	    		// echo "add";
-	    		$rst = $resume_model->add($resume);
+                if ($rst = $resume_model->add($resume)) {
+                    $handle['cv_id'] = $rst;
+                    $handle['status_text'] = "新投递";
+
+                    $rst = M('resume_handle')->add($handle);
+                }
 	    		$tips = "简历创建";
     		}else {
 
@@ -366,6 +391,21 @@ class ResumeController extends BaseController {
 			$this->ajaxReturn(true, 'json');
     	}
 
+    }
+
+    /**
+     * 简历状态展示
+     */
+    public function status(){
+
+        if (self::$RECRUIT_STAGE == 0) {
+            $this->error("当前: \"".self::$RECRUIT_STAGE_INFO."\"".
+                "<br/ >不能查看招聘进度！");
+            return;
+        }
+
+        echo "stauts test";
+        die;
     }
 
     /**
