@@ -25,6 +25,7 @@ class BaseController extends CommonController {
 					case 1:
 					case 2:
 					case 3:
+					case 4:
 						$target_URL = U('Recruit/Resume/status');
 						break;
 					default:// 不可能执行这里

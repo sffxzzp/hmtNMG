@@ -149,6 +149,7 @@ class ResumeController extends BaseController {
                         case 1:
                         case 2:
                         case 3:
+                        case 4:
                             $target_URL = U('Recruit/Resume/status');
                             break;
                         default:// 不可能执行这里
@@ -172,7 +173,7 @@ class ResumeController extends BaseController {
 
         if (self::$RECRUIT_STAGE != 0) {
             $this->error("当前: \"".self::$RECRUIT_STAGE_INFO."\"".
-                "<br/ >只有 \"".self::RECRUIT_STAGE_0_INFO."\" 才能更新简历！");
+                "<br/ >只有 \"".self::RECRUIT_STAGE_0_INFO."\" 才能更新简历！", U('Recruit/Resume/status'));
             return;
         }
 
