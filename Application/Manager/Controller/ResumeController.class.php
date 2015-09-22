@@ -25,6 +25,44 @@ class ResumeController extends BaseController {
 
     public function lists(){
 
+        // P($_SERVER);
+        // die;
+
+        // 如果没有target参数，或者有target但是target不在导航内
+        if (!I('get.target') || !array_key_exists(I('get.target'), self::$navbar)) {
+            $default_nav = self::$default_nav;
+            redirect($default_nav['url']);
+        }
+
+        // 根据target，从数据库相应内容，赋值到all_CVs
+        switch (I('get.target')) {
+          case 'pendingcvs':// 空
+            $status = array('EXP','IS NULL');
+            break;
+          case 'passedcvs':
+            $status = self::CV_PASS;
+            break;
+          case 'failedcvs':
+            $status = self::CV_FAIL;
+            break;
+          case 'interviewpass':
+            $status = self::INTERVIEW_PASS;
+            break;
+          case 'interviewfailed':
+            $status = self::INTERVIEW_FAIL;
+            break;
+          case 'intershippass':
+            $status = self::INTERSHIP_PASS;
+            break;
+          case 'intershipfailed':
+            $status = self::INTERSHIP_FAIL;
+            break;
+          default:
+            break;
+        }
+
+        // var_dump($status);
+
         // echo self::$RECRUIT_STAGE;die;
 
     	$info = session('MANAGER_INFO');
@@ -33,22 +71,80 @@ class ResumeController extends BaseController {
 
     	if ($info['d_ID'] == 9) {// 总负责人
     		
-            $all_CVs = $model->join('district ON resume.willing_district = district.district_id')->select();
+            for ($i=1; $i <= 5; $i++) { 
+                $map['district_'.$i] = $status;
+            }
+
+            switch (I('get.target')) {
+              case 'pendingcvs':
+                $map['status_text'] = self::TEXT_CV_NEW;
+                break;
+              case 'passedcvs':
+              case 'interviewpass':
+              case 'interviewfailed':
+              case 'intershippass':
+              case 'intershipfailed':
+                // 以上，有1个满足即可
+                $map['_logic'] = 'or';
+                break;
+              case 'failedcvs':
+                // accept_deploy = 1 && 5区都不通过
+                // 或者accept_deploy = 0 && (5区有1区不通过)
+                $map = '(`accept_deploy`=1 AND `district_1`='.self::CV_FAIL
+                    .' AND `district_2`='.self::CV_FAIL
+                    .' AND `district_3`='.self::CV_FAIL
+                    .' AND `district_5`='.self::CV_FAIL
+                    .' AND `district_4`='.self::CV_FAIL.')'
+                    .'OR (`accept_deploy`=0 AND (`district_1`='.self::CV_FAIL
+                        .' OR `district_2`='.self::CV_FAIL
+                        .' OR `district_3`='.self::CV_FAIL
+                        .' OR `district_4`='.self::CV_FAIL
+                        .' OR `district_5`='.self::CV_FAIL.'))';
+                break;
+              default:
+                break;
+            }
+
+            $all_CVs = $model->join('district ON resume.willing_district = district.district_id')
+                    ->join('resume_handle ON resume.cv_id = resume_handle.cv_id')
+                    ->field('resume.cv_id,stu_id,name,photo,gender,birthday,birth_place,race,college,major,phone,short_phone,address,willing_district,accept_deploy,free_time,hobbies_n_expertise,reason,skill_level,joined_group,self_assessment,cTime,lastEditTime,cv_flag,district_name,last_rst_district,status_text')
+                    ->where($map)
+                    ->select();
         }else {
 
-	    	$first['willing_district'] = $info['d_ID'];
-        	$first_willing_CVs = $model->join('district ON resume.willing_district = district.district_id')->where($first)->select();
+            $first['willing_district'] = $info['d_ID'];
+	    	$first['district_'.$info['d_ID']] = $status;
+        	$first_willing_CVs = $model->join('district ON resume.willing_district = district.district_id')
+                    ->join('resume_handle ON resume.cv_id = resume_handle.cv_id')
+                    ->where($first)
+                    ->field('resume.cv_id,stu_id,name,photo,gender,birthday,birth_place,race,college,major,phone,short_phone,address,willing_district,accept_deploy,free_time,hobbies_n_expertise,reason,skill_level,joined_group,self_assessment,cTime,lastEditTime,cv_flag,district_name,'.'district_'.$info['d_ID'].',last_rst_district,status_text')
+                    ->select();
 
             $other['willing_district']  = array('neq',$info['d_ID']);
             $other['accept_deploy']  = array('eq',1);
-            $other_accecpt_deploy_CVs = $model->join('district ON resume.willing_district = district.district_id')->where($other)->select();
+            $other['district_'.$info['d_ID']] = $status;
+            $other_accecpt_deploy_CVs = $model->join('district ON resume.willing_district = district.district_id')
+                    ->join('resume_handle ON resume.cv_id = resume_handle.cv_id')
+                    ->where($other)
+                    ->field('resume.cv_id,stu_id,name,photo,gender,birthday,birth_place,race,college,major,phone,short_phone,address,willing_district,accept_deploy,free_time,hobbies_n_expertise,reason,skill_level,joined_group,self_assessment,cTime,lastEditTime,cv_flag,district_name,'.'district_'.$info['d_ID'].',last_rst_district,status_text')
+                    ->select();
 
-            $all_CVs = array_merge($first_willing_CVs, $other_accecpt_deploy_CVs);
+            if (is_array($first_willing_CVs) && is_array($other_accecpt_deploy_CVs)) {
+                $all_CVs = array_merge($first_willing_CVs, $other_accecpt_deploy_CVs);
+            }elseif(is_array($first_willing_CVs)){
+                $all_CVs = $first_willing_CVs;
+            }else{
+                $all_CVs = $other_accecpt_deploy_CVs;
+            }
         }
         
+        // p($model);
+        // p($first_willing_CVs);
+        // p($other_accecpt_deploy_CVs);
         // p($all_CVs);die;
 
         $this->assign('data', $all_CVs);
+        $this->assign('navbar', self::$navbar);
         $this->display();
     }
 
@@ -116,7 +212,7 @@ class ResumeController extends BaseController {
         // die;
 
         if ($rst) {
-            $this->success(self::TEXT_CV_PASS."，处理成功！", U('Manager/Resume/lists'));
+            $this->success(self::TEXT_CV_PASS."，处理成功！", U('Manager/Resume/lists').'?'.$_SERVER['QUERY_STRING']);
         }else{
             $this->error(self::TEXT_CV_PASS."，处理失败！");
         }
