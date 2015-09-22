@@ -18,9 +18,9 @@
 
 		.is-Overflow {  
 		  overflow: auto;  
-		} 
+		}
 
-	</style>
+  </style>
 </head>
 <body>
 
@@ -31,12 +31,48 @@
             <?php $info = session('MANAGER_INFO');?>
             <span><a href="{:U('Manager/User/quit')}" class="pull-right">退出</a></span>
             <h3 class="text-center text-info">{$info['d_name']}</h3>
-            <h1 class="text-center text-primary">待处理简历</h1>
+
+            <h1 class="text-center text-primary"><?php echo Manager\Controller\BaseController::$RECRUIT_STAGE_INFO;?></h1>
           </div>
+
+          <!-- 导航条 -->
+          <div class="navbar navbar-default" role="navigation">
+            <div class="navbar-header">
+                 <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                   <span class="sr-only">Toggle Navigation</span>
+                   <span class="icon-bar"></span>
+                   <span class="icon-bar"></span>
+                   <span class="icon-bar"></span>
+                 </button>
+                 <a href="##" class="navbar-brand">简历分类</a>
+            </div>
+            <div class="collapse navbar-collapse navbar-responsive-collapse">
+                <ul class="nav navbar-nav">
+
+                  <?php $target = I('get.target');?>
+                  <foreach name="navbar" item="one" >
+                    <li <?php if (strpos($one['url'], $target) !== false) {
+                      echo 'class="active"';
+                      $cur_operation = $one['name'];// 当前导航操作
+                    }?>><a href="{$one['url']}">{$one['name']}</a></li>
+                  </foreach>
+              </ul>
+            </div>
+          </div>
+
         <foreach name="data" item="one" >
           <?php $one = format_sqlData_to_formData($one);?>
           <div class="modal-body">
-
+            <div class="">
+              <div class="btn-group">
+                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">{$cur_operation}<span class="caret"></span></button>
+                  <ul class="dropdown-menu">
+                    <foreach name="navbar[$target]['operation']" item="oper" >
+                      <li><a href="{$oper[url]}?id={$one[cv_id]}">{$oper['name']}</a></li>
+                    </foreach>
+                  </ul>
+              </div>
+            </div>
             <div class="container-fluid">
              <div class="accordion" id="stu-{$one['stu_id']}">
               <div class="accordion-group">
@@ -44,7 +80,9 @@
                   <a class="accordion-toggle" data-toggle="collapse" data-parent="#stu-{$one['stu_id']}" href="#stu-{$one['stu_id']}-content">
                     <div class="text-center">
                         <img class="img-circle" src="{$recruit_SRC}/images/photo/{$one['photo']}" alt="无图无真相" style="width:100px;height:100px" >
+
                     </div>
+                    
                     <div class="text-center">
                         <label class="">
                             <span><span for="name">{$one['name']}</span> <span for="class" class="text-warning">{:substr($one['stu_id'], 2, 2)}级</span> <span for="college">{$one['college']}学院</span></span><br>
@@ -53,8 +91,11 @@
                                 echo "<span class='text-success'>接受调配</span>";
                             }else{
                                 echo "<span class='text-danger'>不接受调配</span>";
-                            }?></span></span>
+                            }?></span></span><br>
+
+                            <span><span for="status_text" class="text-danger">{$one['status_text']}</span></span>
                         </label>
+                        
                     </div>
                   </a>
                 </div>
@@ -123,7 +164,7 @@
                                 <div class="col-sm-10 form-inline">
                                  <div class="input-group">
                                   <label for="" class="sr-only">Race</label>
-                                  <input type="text" class="form-control info" id="" name="" value="{$one['race']}" placeholder="如: 汉" >
+                                  <input type="text" class="form-control" id="" name="" value="{$one['race']}" placeholder="如: 汉" >
                                   <span class="input-group-addon">族</span>
                                  </div>
                                 </div>
