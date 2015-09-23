@@ -68,7 +68,8 @@
                     <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">{$cur_operation}<span class="caret"></span></button>
                   <ul class="dropdown-menu">
                     <foreach name="navbar[$target]['operation']" item="oper" >
-                      <li><a href="{$oper[url]}?id={$one[cv_id]}">{$oper['name']}</a></li>
+                      <?php $url = $oper['url'] . (strpos($oper['url'], '?') ? '&' : '?') .'id='.$one['cv_id'];?>
+                      <li><a href="{$url}">{$oper['name']}</a></li>
                     </foreach>
                   </ul>
               </div>

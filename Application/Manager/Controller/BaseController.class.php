@@ -14,96 +14,96 @@ class BaseController extends CommonController {
 	protected function _initialize(){
 
 		parent::_initialize();
+		
+		// 设置导航
+		$target_c = U("Manager/Resume/lists");
+		switch (self::$RECRUIT_STAGE) {
+			case 0:
+				// 设置默认初始导航
+				self::$default_nav['name'] = "待筛选";
+				self::$default_nav['url'] = $target_c."?target=pendingcvs";
 
-		if ($default_nav == '' || self::$RECRUIT_STAGE_CHANGED) {// 导航未设置 || 阶段有改变
-			
-			// 设置导航
-			$target_c = U("Manager/Resume/lists");
-			switch (self::$RECRUIT_STAGE) {
-				case 0:
-					// 设置默认初始导航
-					self::$default_nav['name'] = "待筛选";
-					self::$default_nav['url'] = $target_c."?target=pendingcvs";
+				// 设置导航条
+				self::$navbar['pendingcvs']['name'] = "待筛选";
+				self::$navbar['pendingcvs']['url'] = $target_c."?target=pendingcvs";
+				self::$navbar['pendingcvs']['operation'] = '';// 简历投递阶段，操作为空
+				break;
+			case 1:
+				// 设置默认初始导航
+				self::$default_nav['name'] = "待筛选";
+				self::$default_nav['url'] = $target_c."?target=pendingcvs";
 
-					// 设置导航条
-					self::$navbar['pendingcvs']['name'] = "待筛选";
-					self::$navbar['pendingcvs']['url'] = $target_c."?target=pendingcvs";
-					self::$navbar['pendingcvs']['operation'] = '';// 简历投递阶段，操作为空
-					break;
-				case 1:
-					// 设置默认初始导航
-					self::$default_nav['name'] = "待筛选";
-					self::$default_nav['url'] = $target_c."?target=pendingcvs";
+				// 设置导航条
+				self::$navbar['pendingcvs']['name'] = "待筛选";
+				self::$navbar['pendingcvs']['url'] = $target_c."?target=pendingcvs";
+				self::$navbar['pendingcvs']['operation'][0]['name'] = '简历通过';
+				self::$navbar['pendingcvs']['operation'][0]['url']  = U('Manager/Resume/cv_pass');
+				self::$navbar['pendingcvs']['operation'][1]['name'] = '简历未通过';
+				self::$navbar['pendingcvs']['operation'][1]['url']  = U('Manager/Resume/cv_fail');
+				self::$navbar['failedcvs']['name'] = "未通过筛选";
+				self::$navbar['failedcvs']['url'] = $target_c."?target=failedcvs";
+				self::$navbar['passedcvs']['name'] = "等待面试";
+				self::$navbar['passedcvs']['url'] = $target_c."?target=passedcvs";
+				break;
+			case 2:
+				// 设置默认初始导航
+				self::$default_nav['name'] = "等待面试";
+				self::$default_nav['url'] = $target_c."?target=passedcvs";
 
-					// 设置导航条
-					self::$navbar['pendingcvs']['name'] = "待筛选";
-					self::$navbar['pendingcvs']['url'] = $target_c."?target=pendingcvs";
-					self::$navbar['pendingcvs']['operation'][0]['name'] = '简历通过';
-					self::$navbar['pendingcvs']['operation'][0]['url']  = U('Manager/Resume/cv_pass');
-					self::$navbar['pendingcvs']['operation'][1]['name'] = '简历未通过';
-					self::$navbar['pendingcvs']['operation'][1]['url']  = U('Manager/Resume/cv_fail');
-					self::$navbar['failedcvs']['name'] = "未通过筛选";
-					self::$navbar['failedcvs']['url'] = $target_c."?target=failedcvs";
-					self::$navbar['failedcvs']['operation'] = '';// 简历筛选阶段，操作不可逆
-					self::$navbar['passedcvs']['name'] = "等待面试";
-					self::$navbar['passedcvs']['url'] = $target_c."?target=passedcvs";
-					self::$navbar['passedcvs']['operation'] = '';// 简历筛选阶段，操作不可逆
-					break;
-				case 2:
-					// 设置默认初始导航
-					self::$default_nav['name'] = "等待面试";
-					self::$default_nav['url'] = $target_c."?target=passedcvs";
+				// 设置导航条
+				self::$navbar['passedcvs']['name'] = "等待面试";
+				self::$navbar['passedcvs']['url'] = $target_c."?target=passedcvs";
+				self::$navbar['passedcvs']['operation'][0]['name'] = '面试通过';
+				self::$navbar['passedcvs']['operation'][0]['url']  = U('Manager/Resume/interview_rst').'?pass';
+				self::$navbar['passedcvs']['operation'][1]['name'] = '面试未通过';
+				self::$navbar['passedcvs']['operation'][1]['url']  = U('Manager/Resume/interview_rst').'?fail';
+				self::$navbar['failedcvs']['name'] = "未通过筛选";// 可以霸面
+				self::$navbar['failedcvs']['url'] = $target_c."?target=failedcvs";
+				self::$navbar['failedcvs']['operation'][0]['name'] = '霸面通过';
+				self::$navbar['failedcvs']['operation'][0]['url']  = U('Manager/Resume/interview_rst').'?pass';
+				self::$navbar['failedcvs']['operation'][1]['name'] = '霸面未通过';
+				self::$navbar['failedcvs']['operation'][1]['url']  = U('Manager/Resume/interview_rst').'?fail';
+				self::$navbar['interviewfailed']['name'] = "未通过面试";
+				self::$navbar['interviewfailed']['url'] = $target_c."?target=interviewfailed";
+				self::$navbar['interviewpass']['name'] = "实习生";
+				self::$navbar['interviewpass']['url'] = $target_c."?target=interviewpass";
+				break;
+			case 3:
+				// 设置默认初始导航
+				self::$default_nav['name'] = "实习生";
+				self::$default_nav['url'] = $target_c."?target=interviewpass";
 
-					// 设置导航条
-					self::$navbar['passedcvs']['name'] = "等待面试";
-					self::$navbar['passedcvs']['url'] = $target_c."?target=passedcvs";
-					self::$navbar['passedcvs']['operation'][0]['name'] = '面试通过';
-					self::$navbar['passedcvs']['operation'][0]['url']  = U('Manager/Resume/interview_pass');
-					self::$navbar['passedcvs']['operation'][1]['name'] = '面试未通过';
-					self::$navbar['passedcvs']['operation'][1]['url']  = U('Manager/Resume/interview_fail');
-					self::$navbar['failedcvs']['name'] = "未通过筛选";// 可以霸面
-					self::$navbar['failedcvs']['url'] = $target_c."?target=failedcvs";
-					self::$navbar['failedcvs']['operation'][0]['name'] = '霸面通过';
-					self::$navbar['failedcvs']['operation'][0]['url']  = U('Manager/Resume/interview_pass');
-					self::$navbar['failedcvs']['operation'][1]['name'] = '霸面未通过';
-					self::$navbar['failedcvs']['operation'][1]['url']  = U('Manager/Resume/interview_fail');
-					break;
-				case 3:
-					// 设置默认初始导航
-					self::$default_nav['name'] = "实习生";
-					self::$default_nav['url'] = $target_c."?target=interviewpass";
+				// 设置导航条
+				self::$navbar['interviewpass']['name'] = "实习生";
+				self::$navbar['interviewpass']['url'] = $target_c."?target=interviewpass";
+				self::$navbar['interviewpass']['operation'][0]['name'] = '实习转正';
+				self::$navbar['interviewpass']['operation'][0]['url']  = U('Manager/Resume/internship_rst').'?pass';
+				self::$navbar['interviewpass']['operation'][1]['name'] = '实习淘汰';
+				self::$navbar['interviewpass']['operation'][1]['url']  = U('Manager/Resume/internship_rst').'?fail';
+				self::$navbar['interviewfailed']['name'] = "未通过面试";
+				self::$navbar['interviewfailed']['url'] = $target_c."?target=interviewfailed";
+				self::$navbar['internshippass']['name'] = "转正";
+				self::$navbar['internshippass']['url'] = $target_c."?target=internshippass";
+				self::$navbar['internshipfailed']['name'] = "实习淘汰";
+				self::$navbar['internshipfailed']['url'] = $target_c."?target=internshipfailed";
+				break;
+			case 4:
+				// 设置默认初始导航
+				self::$default_nav['name'] = "转正";
+				self::$default_nav['url'] = $target_c."?target=internshippass";
 
-					// 设置导航条
-					self::$navbar['interviewpass']['name'] = "实习生";
-					self::$navbar['interviewpass']['url'] = $target_c."?target=interviewpass";
-					self::$navbar['interviewpass']['operation'][0]['name'] = '实习转正';
-					self::$navbar['interviewpass']['operation'][0]['url']  = U('Manager/Resume/internship_pass');
-					self::$navbar['interviewpass']['operation'][1]['name'] = '实习淘汰';
-					self::$navbar['interviewpass']['operation'][1]['url']  = U('Manager/Resume/internship_fail');
-					self::$navbar['interviewfailed']['name'] = "未通过面试";
-					self::$navbar['interviewfailed']['url'] = $target_c."?target=interviewfailed";
-					self::$navbar['interviewfailed']['operation'] = '';// 实习阶段，操作为空
-					break;
-				case 4:
-					// 设置默认初始导航
-					self::$default_nav['name'] = "转正";
-					self::$default_nav['url'] = $target_c."?target=intershippass";
-
-					// 设置导航条
-					self::$navbar['intershippass']['name'] = "转正";
-					self::$navbar['intershippass']['url'] = $target_c."?target=intershippass";
-					self::$navbar['intershippass']['operation'] = '';// 转正阶段，操作为空
-					self::$navbar['intershipfailed']['name'] = "实习淘汰";
-					self::$navbar['intershipfailed']['url'] = $target_c."?target=intershipfailed";
-					self::$navbar['interviewfailed']['operation'] = '';// 转正阶段，操作为空
-					// self::$navbar['allfailed']['name'] = "所有淘汰者";
-					// self::$navbar['allfailed']['url'] = $target_c."?target=allfailed";
-					// self::$navbar['allfailed']['operation'] = '';// 转正阶段，操作为空
-					break;
-				default:
-					// 不可能执行到这里
-					break;
-			}
+				// 设置导航条
+				self::$navbar['internshippass']['name'] = "转正";
+				self::$navbar['internshippass']['url'] = $target_c."?target=internshippass";
+				self::$navbar['internshipfailed']['name'] = "实习淘汰";
+				self::$navbar['internshipfailed']['url'] = $target_c."?target=internshipfailed";
+				// self::$navbar['allfailed']['name'] = "所有淘汰者";
+				// self::$navbar['allfailed']['url'] = $target_c."?target=allfailed";
+				// self::$navbar['allfailed']['operation'] = '';// 转正阶段，操作为空
+				break;
+			default:
+				// 不可能执行到这里
+				break;
 		}
 
 		// session('MANAGER_LOGIN_FLAG',null);
