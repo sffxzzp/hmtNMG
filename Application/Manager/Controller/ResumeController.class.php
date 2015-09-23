@@ -13,10 +13,10 @@ class ResumeController extends BaseController {
     const TEXT_INTERVIEW_PASS             =   "面试(通过)";
     const INTERVIEW_FAIL                  =   6;// 面试未通过
     const TEXT_INTERVIEW_FAIL             =   "面试(未通过)";
-    const INTERSHIP_PASS                  =   8;// 成功转正
-    const TEXT_INTERSHIP_PASS             =   "成功转正";
-    const INTERSHIP_FAIL                  =   9;// 实习淘汰
-    const TEXT_INTERSHIP_FAIL             =   "实习淘汰";
+    const INTERNSHIP_PASS                 =   8;// 成功转正
+    const TEXT_INTERNSHIP_PASS            =   "成功转正";
+    const INTERNSHIP_FAIL                 =   9;// 实习淘汰
+    const TEXT_INTERNSHIP_FAIL            =   "实习淘汰";
 
 
     public function index(){
@@ -25,16 +25,13 @@ class ResumeController extends BaseController {
 
     public function lists(){
 
-        // P($_SERVER);
-        // die;
-
         // 如果没有target参数，或者有target但是target不在导航内
         if (!I('get.target') || !array_key_exists(I('get.target'), self::$navbar)) {
             $default_nav = self::$default_nav;
             redirect($default_nav['url']);
         }
 
-        // 根据target，从数据库相应内容，赋值到all_CVs
+        // 根据target，从数据库取相应内容
         switch (I('get.target')) {
           case 'pendingcvs':// 空
             $status = array('EXP','IS NULL');
@@ -51,11 +48,11 @@ class ResumeController extends BaseController {
           case 'interviewfailed':
             $status = self::INTERVIEW_FAIL;
             break;
-          case 'intershippass':
-            $status = self::INTERSHIP_PASS;
+          case 'internshippass':
+            $status = self::INTERNSHIP_PASS;
             break;
-          case 'intershipfailed':
-            $status = self::INTERSHIP_FAIL;
+          case 'internshipfailed':
+            $status = self::INTERNSHIP_FAIL;
             break;
           default:
             break;
@@ -82,8 +79,8 @@ class ResumeController extends BaseController {
               case 'passedcvs':
               case 'interviewpass':
               case 'interviewfailed':
-              case 'intershippass':
-              case 'intershipfailed':
+              case 'internshippass':
+              case 'internshipfailed':
                 // 以上，有1个满足即可
                 $map['_logic'] = 'or';
                 break;
@@ -212,7 +209,7 @@ class ResumeController extends BaseController {
         // die;
 
         if ($rst) {
-            $this->success(self::TEXT_CV_PASS."，处理成功！", U('Manager/Resume/lists').'?'.$_SERVER['QUERY_STRING']);
+            $this->success(self::TEXT_CV_PASS."，处理成功！", U('Manager/Resume/lists').(isset($_SERVER['HTTP_REFERER']) ? '?'.end(explode('?', $_SERVER['HTTP_REFERER'])) : ''));
         }else{
             $this->error(self::TEXT_CV_PASS."，处理失败！");
         }
@@ -222,6 +219,10 @@ class ResumeController extends BaseController {
      * 简历未通过筛选
      */
     public function cv_fail(){
+
+        // p($_SERVER);
+        // die;
+
         if (self::$RECRUIT_STAGE != 1) {
             $this->error("当前: \"".self::$RECRUIT_STAGE_INFO."\"".
                 "<br/ >只有 \"".self::RECRUIT_STAGE_1_INFO."\" 才能筛选简历！");
@@ -300,7 +301,7 @@ class ResumeController extends BaseController {
         $rst = $model->save($handle);
 
         if ($rst) {
-            $this->success(self::TEXT_CV_FAIL."，处理成功！", U('Manager/Resume/lists'));
+            $this->success(self::TEXT_CV_FAIL."，处理成功！", U('Manager/Resume/lists').(isset($_SERVER['HTTP_REFERER']) ? '?'.end(explode('?', $_SERVER['HTTP_REFERER'])) : ''));
         }else{
             $this->error(self::TEXT_CV_FAIL."，处理失败！");
         }
@@ -309,44 +310,324 @@ class ResumeController extends BaseController {
     /**
      * 面试通过
      */
-    public function interview_pass(){
+    /*public function interview_pass(){
         if (self::$RECRUIT_STAGE != 2) {
             $this->error("当前: \"".self::$RECRUIT_STAGE_INFO."\"".
                 "<br/ >只有 \"".self::RECRUIT_STAGE_2_INFO."\" 才能更新面试状态！");
             return;
         }
-    }
+
+        if (I('get.id') == '') {
+            $this->error("id不能为空！");
+            return;
+        }
+
+        $info = session('MANAGER_INFO');
+        if ($info['d_ID'] == 9) {
+            $this->error("总负责人不能处理简历！");
+            return;
+        }
+
+        $cv_id = I('get.id');// 简历编号
+        $resume = M('resume')->find($cv_id);
+
+        if (!$resume) {
+            $this->error("不存在的简历！");
+            return;
+        }
+
+        if ($resume['accept_deploy'] == 0) {// 不接受调配
+            if ($info['d_ID'] != $resume['willing_district']) {// 意愿与处理简历的管理员区域不符(避免管理员的非法操作)
+                $this->error("该应聘者不接受调配，还是不要强人所难了！");
+                return;
+            }
+        }
+
+        $model = M('resume_handle');
+        $old_handle_data = $model->find($cv_id);// 获取旧的处理结果数据
+        // 只要有1个区处理状态为5或6，则该人已有面试结果
+        $hasInterviewed = false;
+        for ($i=1; $i <= 5; $i++) { 
+            if ($old_handle_data['district_'.$i] == self::INTERVIEW_PASS || $old_handle_data['district_'.$i] == self::INTERVIEW_FAIL) {
+                $hasInterviewed = true;
+                break;
+            }
+        }
+        if ($hasInterviewed) {
+            $this->error("该面试者已有面试结果，请勿重复操作！");
+            return;
+        }
+
+        // 只能来自状态1和3，则五个区中只要有1或3就行
+        $canInterview = false;
+        for ($i=1; $i <= 5; $i++) { 
+            if ($old_handle_data['district_'.$i] == self::CV_PASS || $old_handle_data['district_'.$i] == self::CV_FAIL) {
+                $canInterview = true;
+                break;
+            }
+        }
+        if (!$canInterview) {
+            $this->error("该面试者无权参与面试！");
+            return;
+        }
+
+        $handle['cv_id'] = $cv_id;
+        $handle['district_'.$info['d_ID']] = self::INTERVIEW_PASS;
+        $handle['last_rst_district'] = $info['d_ID'];// 最终去向
+        $handle['status_text'] = $old_handle_data['status_text']." -> ".self::TEXT_INTERVIEW_PASS.'['.$info['d_name'].']';
+        
+        $rst = $model->save($handle);
+
+        if ($rst) {
+            $this->success(self::TEXT_INTERVIEW_PASS."，处理成功！", U('Manager/Resume/lists').(isset($_SERVER['HTTP_REFERER']) ? '?'.end(explode('?', $_SERVER['HTTP_REFERER'])) : ''));
+        }else{
+            $this->error(self::TEXT_INTERVIEW_PASS."，处理失败！");
+        }
+    }*/
 
     /**
-     * 面试未通过
+     * 面试结果
+     * pass / fail
      */
-    public function interview_fail(){
+    public function interview_rst(){
         if (self::$RECRUIT_STAGE != 2) {
             $this->error("当前: \"".self::$RECRUIT_STAGE_INFO."\"".
                 "<br/ >只有 \"".self::RECRUIT_STAGE_2_INFO."\" 才能更新面试状态！");
             return;
+        }
+
+        if (I('get.id') == '') {
+            $this->error("id不能为空！");
+            return;
+        }
+
+        $get = I('get.');
+        if (!isset($get['pass']) && !isset($get['fail'])) {
+            $this->error("未指定结果！");
+            return;
+        }
+
+        $info = session('MANAGER_INFO');
+        if ($info['d_ID'] == 9) {
+            $this->error("总负责人不能处理简历！");
+            return;
+        }
+
+        $cv_id = I('get.id');// 简历编号
+        $resume = M('resume')->find($cv_id);
+
+        if (!$resume) {
+            $this->error("不存在的简历！");
+            return;
+        }
+
+        // 通过与不通过，判断的条件不同
+        if (isset($get['pass'])) {// pass
+
+            if ($resume['accept_deploy'] == 0) {// 不接受调配
+                if ($info['d_ID'] != $resume['willing_district']) {// 意愿与处理简历的管理员区域不符(避免管理员的非法操作)
+                    $this->error("该应聘者不接受调配，还是不要强人所难了！");
+                    return;
+                }
+            }
+        }else {// fail
+            
+            if ($info['d_ID'] != $resume['willing_district']) {
+                $this->error("只有对应的意向区才能刷面试者哦！");
+                return;
+            }
+        }
+
+        $model = M('resume_handle');
+        $old_handle_data = $model->find($cv_id);// 获取旧的处理结果数据
+        // 只要有1个区处理状态为5或6，则该人已有面试结果
+        $hasInterviewed = false;
+        for ($i=1; $i <= 5; $i++) { 
+            if ($old_handle_data['district_'.$i] == self::INTERVIEW_PASS || $old_handle_data['district_'.$i] == self::INTERVIEW_FAIL) {
+                $hasInterviewed = true;
+                break;
+            }
+        }
+        if ($hasInterviewed) {
+            $this->error("该面试者已有面试结果，请勿重复操作！");
+            return;
+        }
+
+        // 只能来自状态1和3，则五个区中只要有1或3就行
+        $canInterview = false;
+        for ($i=1; $i <= 5; $i++) { 
+            if ($old_handle_data['district_'.$i] == self::CV_PASS || $old_handle_data['district_'.$i] == self::CV_FAIL) {
+                $canInterview = true;
+                break;
+            }
+        }
+        if (!$canInterview) {
+            $this->error("该面试者无权参与面试！");
+            return;
+        }
+
+        $tip = '';
+        if (isset($get['pass'])) {// pass
+            
+            $handle['cv_id'] = $cv_id;
+            $handle['district_'.$info['d_ID']] = self::INTERVIEW_PASS;
+            $handle['last_rst_district'] = $info['d_ID'];// 最终去向
+            $handle['status_text'] = $old_handle_data['status_text']." -> ".self::TEXT_INTERVIEW_PASS.'['.$info['d_name'].']';
+            $tip = self::TEXT_INTERVIEW_PASS;
+        }else {// fail
+
+            $handle['cv_id'] = $cv_id;
+            $handle['district_'.$info['d_ID']] = self::INTERVIEW_FAIL;
+            $handle['status_text'] = $old_handle_data['status_text']." -> ".self::TEXT_INTERVIEW_FAIL;
+            $tip = self::TEXT_INTERVIEW_FAIL;
+        }
+        
+        $rst = $model->save($handle);
+
+        if ($rst) {
+            $this->success($tip."，处理成功！", U('Manager/Resume/lists').(isset($_SERVER['HTTP_REFERER']) ? '?'.end(explode('?', $_SERVER['HTTP_REFERER'])) : ''));
+        }else{
+            $this->error($tip."，处理失败！");
         }
     }
 
     /**
      * 实习转正
      */
-    public function internship_pass(){
+    /*public function internship_pass(){
         if (self::$RECRUIT_STAGE != 3) {
             $this->error("当前: \"".self::$RECRUIT_STAGE_INFO."\"".
                 "<br/ >只有 \"".self::RECRUIT_STAGE_3_INFO."\" 才能更新最终状态！");
             return;
         }
-    }
+
+        if (I('get.id') == '') {
+            $this->error("id不能为空！");
+            return;
+        }
+
+        $info = session('MANAGER_INFO');
+        if ($info['d_ID'] == 9) {
+            $this->error("总负责人不能处理简历！");
+            return;
+        }
+
+        $cv_id = I('get.id');// 简历编号
+        $resume = M('resume')->find($cv_id);
+
+        if (!$resume) {
+            $this->error("不存在的简历！");
+            return;
+        }
+
+        $model = M('resume_handle');
+        $old_handle_data = $model->find($cv_id);// 获取旧的处理结果数据
+        // last_rst_district为空 或者状态不是5，非实习生
+        if ($old_handle_data['last_rst_district'] == '' || $old_handle_data['district_'.$old_handle_data['last_rst_district']] != self::INTERVIEW_PASS) {
+            $this->error("非实习生！非法操作！");
+            return;
+        }
+
+        // 防止跨实习区操作
+        if ($info['d_ID'] != $old_handle_data['last_rst_district']) {
+            $this->error("您与实习生所在实习区不符，不能给出实习结果！");
+            return;
+        }
+
+        // 如果'district_'.$last_rst_district状态为8或9，则已处理
+        if ($old_handle_data['district_'.$old_handle_data['last_rst_district']] == self::INTERNSHIP_PASS || $old_handle_data['district_'.$old_handle_data['last_rst_district']] == self::INTERNSHIP_FAIL) {
+            $this->error("该实习生已有实习结果，请勿重复操作！");
+            return;
+        }
+
+        $handle['cv_id'] = $cv_id;
+        $handle['district_'.$info['d_ID']] = self::INTERNSHIP_PASS;
+        $handle['status_text'] = $old_handle_data['status_text']." -> ".self::TEXT_INTERNSHIP_PASS;
+        
+        $rst = $model->save($handle);
+
+        if ($rst) {
+            $this->success(self::TEXT_INTERNSHIP_PASS."，处理成功！", U('Manager/Resume/lists').(isset($_SERVER['HTTP_REFERER']) ? '?'.end(explode('?', $_SERVER['HTTP_REFERER'])) : ''));
+        }else{
+            $this->error(self::TEXT_INTERNSHIP_PASS."，处理失败！");
+        }
+    }*/
 
     /**
-     * 实习淘汰
+     * 实习结果
+     * psss / fail
      */
-    public function internship_fail(){
+    public function internship_rst(){
         if (self::$RECRUIT_STAGE != 3) {
             $this->error("当前: \"".self::$RECRUIT_STAGE_INFO."\"".
                 "<br/ >只有 \"".self::RECRUIT_STAGE_3_INFO."\" 才能更新最终状态！");
             return;
+        }
+
+        if (I('get.id') == '') {
+            $this->error("id不能为空！");
+            return;
+        }
+
+        $get = I('get.');
+        if (!isset($get['pass']) && !isset($get['fail'])) {
+            $this->error("未指定结果！");
+            return;
+        }
+
+        $info = session('MANAGER_INFO');
+        if ($info['d_ID'] == 9) {
+            $this->error("总负责人不能处理简历！");
+            return;
+        }
+
+        $cv_id = $get['id'];// 简历编号
+        $resume = M('resume')->find($cv_id);
+
+        if (!$resume) {
+            $this->error("不存在的简历！");
+            return;
+        }
+
+        $model = M('resume_handle');
+        $old_handle_data = $model->find($cv_id);// 获取旧的处理结果数据
+        // last_rst_district为空 或者状态不是5，非实习生
+        if ($old_handle_data['last_rst_district'] == '' || $old_handle_data['district_'.$old_handle_data['last_rst_district']] != self::INTERVIEW_PASS) {
+            $this->error("非实习生！非法操作！");
+            return;
+        }
+
+        // 防止跨实习区操作
+        if ($info['d_ID'] != $old_handle_data['last_rst_district']) {
+            $this->error("您与实习生所在实习区不符，不能给出实习结果！");
+            return;
+        }
+
+        // 如果'district_'.$last_rst_district状态为8或9，则已处理
+        if ($old_handle_data['district_'.$old_handle_data['last_rst_district']] == self::INTERNSHIP_PASS || $old_handle_data['district_'.$old_handle_data['last_rst_district']] == self::INTERNSHIP_FAIL) {
+            $this->error("该实习生已有实习结果，请勿重复操作！");
+            return;
+        }
+
+        $tip = '';// 提示信息
+        if (isset($get['pass'])) {// pass
+            $handle['cv_id'] = $cv_id;
+            $handle['district_'.$info['d_ID']] = self::INTERNSHIP_PASS;
+            $handle['status_text'] = $old_handle_data['status_text']." -> ".self::TEXT_INTERNSHIP_PASS;
+            $tip = self::TEXT_INTERNSHIP_PASS;
+        }else {// fail
+            $handle['cv_id'] = $cv_id;
+            $handle['district_'.$info['d_ID']] = self::INTERNSHIP_FAIL;
+            $handle['status_text'] = $old_handle_data['status_text']." -> ".self::TEXT_INTERNSHIP_FAIL;
+            $tip = self::TEXT_INTERNSHIP_FAIL;
+        }
+
+        $rst = $model->save($handle);
+
+        if ($rst) {
+            $this->success($tip."，处理成功！", U('Manager/Resume/lists').(isset($_SERVER['HTTP_REFERER']) ? '?'.end(explode('?', $_SERVER['HTTP_REFERER'])) : ''));
+        }else{
+            $this->error($tip."，处理失败！");
         }
     }
 }
