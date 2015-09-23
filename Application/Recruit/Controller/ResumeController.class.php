@@ -371,9 +371,9 @@ class ResumeController extends BaseController {
     public function save(){
 
     	if (IS_AJAX) {
-    		
-   //          $data['post'] = I('post.');
-   //          $data['file'] = $_FILES;
+		
+            // $data['post'] = I('post.');
+            // $data['file'] = $_FILES;
 			// $this->ajaxReturn($data, 'json');
 			// return;
 
@@ -404,9 +404,23 @@ class ResumeController extends BaseController {
                 "<br/ >不能查看招聘进度！");
             return;
         }
+        
+        $info = session('RESUME_INFO');
+        // p($info);die;
 
-        echo "stauts test";
-        die;
+        $handle_rst = M('resume')->join('district ON resume.willing_district = district.district_id')
+                ->join('resume_handle ON resume.cv_id = resume_handle.cv_id')
+                ->where($info)
+                ->field('resume.cv_id,stu_id,name,phone,willing_district,accept_deploy,cv_flag,district_name,district_1,district_2,district_3,district_4,district_5,last_rst_district,status_text')
+                ->find();
+
+        // p($handle_rst);die;
+
+        if ($handle_rst) {
+            $this->assign('handle_rst',$handle_rst);
+        }
+    
+        $this->display();
     }
 
     /**
