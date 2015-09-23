@@ -25,34 +25,28 @@ class CommonController extends Controller {
 			return;
 		}
 
-		if (self::$RECRUIT_STAGE == '' || self::$RECRUIT_STAGE != $conf['stage']) {
-			self::$RECRUIT_STAGE_CHANGED = true;
-			
-			self::$RECRUIT_STAGE = $conf['stage'];
-			switch (self::$RECRUIT_STAGE) {
-				case 0:
-					self::$RECRUIT_STAGE_INFO = self::RECRUIT_STAGE_0_INFO;
-					break;
-				case 1:
-					self::$RECRUIT_STAGE_INFO = self::RECRUIT_STAGE_1_INFO;
-					break;
-				case 2:
-					self::$RECRUIT_STAGE_INFO = self::RECRUIT_STAGE_2_INFO;
-					break;
-				case 3:
-					self::$RECRUIT_STAGE_INFO = self::RECRUIT_STAGE_3_INFO;
-					break;
-				case 4:
-					self::$RECRUIT_STAGE_INFO = self::RECRUIT_STAGE_4_INFO;
-					break;
-				default:
-					self::$RECRUIT_STAGE_INFO = "不存在的招聘阶段";
-					$this->error(self::$RECRUIT_STAGE_INFO);
-					return;
-					break;
-			}
-		}else {
-			self::$RECRUIT_STAGE_CHANGED = false;
+		self::$RECRUIT_STAGE = $conf['stage'];
+		switch (self::$RECRUIT_STAGE) {
+			case 0:
+				self::$RECRUIT_STAGE_INFO = self::RECRUIT_STAGE_0_INFO;
+				break;
+			case 1:
+				self::$RECRUIT_STAGE_INFO = self::RECRUIT_STAGE_1_INFO;
+				break;
+			case 2:
+				self::$RECRUIT_STAGE_INFO = self::RECRUIT_STAGE_2_INFO;
+				break;
+			case 3:
+				self::$RECRUIT_STAGE_INFO = self::RECRUIT_STAGE_3_INFO;
+				break;
+			case 4:
+				self::$RECRUIT_STAGE_INFO = self::RECRUIT_STAGE_4_INFO;
+				break;
+			default:
+				self::$RECRUIT_STAGE_INFO = "不存在的招聘阶段";
+				$this->error(self::$RECRUIT_STAGE_INFO);
+				return;
+				break;
 		}
 
 
