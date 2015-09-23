@@ -1,0 +1,338 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<title><?php echo hmtNMG;?></title>
+	<?php $SRC = RECRUIT_SRC; ?>
+	<script type="text/javascript" src="{$SRC}/scripts/jquery.min.js"></script>
+    <script type="text/javascript" src="{$SRC}/scripts/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="{$SRC}/css/bootstrap.min.css">
+	<style>
+
+		body{
+		 font-family: 'microsoft yahei',Arial,sans-serif;
+		 margin:0;
+		 padding:0;
+		}
+
+		.is-Overflow {  
+		  overflow: auto;  
+		} 
+
+	</style>
+</head>
+<body>
+
+    <div id="statusModal" class="modal show is-Overflow">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <?php $info = session('RESUME_INFO');$resume_info = json_decode(cookie($info['stu_id'].'_RESUME_INFO'), true);?>
+          <div class="modal-header">
+            <span><a href="{:U('Recruit/Resume/quit')}" class="pull-right">退出</a></span>
+            <h1 class="text-center text-primary"><?php echo Recruit\Controller\BaseController::$RECRUIT_STAGE_INFO;?></h1>
+            <h3 class="text-center text-warning">招聘进度</h3>
+            <?php
+                $last_rst = end(explode(' -> ', $handle_rst['status_text']));
+                if (strpos($last_rst, '(未通过)') || strpos($last_rst, '淘汰')) {
+                    $text_color = 'text-danger';
+                }else{
+                    $text_color = 'text-success';
+                }
+            ?>
+            <h4 class="text-center {$text_color}">{$handle_rst['status_text']}</h4>
+          </div>
+
+          <div class="container-fluid">
+           <div class="accordion" id="stu-{$info['stu_id']}">
+            <div class="accordion-group">
+              <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#stu-{$info['stu_id']}" href="#stu-{$info['stu_id']}-content">
+
+          <div class="modal-header">
+              <h3 class="text-center text-primary">您的简历</h3>
+              <!-- 简历照片 -->
+              <label for="photo" class="sr-only">Photo</label>
+              <div class="text-center">
+                  <img class="img-circle" id="userImg" src="{$SRC}/images/photo/{$resume_info['photo']}" alt="无图无真相" style="width:100px;height:100px">
+              </div>
+          </div>
+
+                </a>
+              </div>
+              
+              <div id="stu-{$info['stu_id']}-content" class="accordion-body collapse" style="height: 0px; ">
+                <div class="accordion-inner">
+
+        <fieldset disabled>
+          <div class="modal-body">
+            <form id="resume-form" class="form-horizontal center-block" action="#" method="post" enctype="multipart/form-data">
+
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">学号</label>
+                    <div class="col-sm-10">
+                      <label for="stu_id" class="sr-only">Stu_id</label>
+                      <input type="text" class="form-control" id="stu_id" name="stu_id" value="{$info['stu_id']}" required readonly>
+                      <input type="text" id="cv_flag" name="cv_flag" value="{$info['cv_flag']}" required hidden>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">姓名</label>
+                    <div class="col-sm-10">
+                      <label for="name" class="sr-only">Name</label>
+                      <input type="text" class="form-control" id="name" name="name" value="{$resume_info['name']}" placeholder="" required>
+                    </div>
+                </div>
+              
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">性别</label>
+                  <div class="col-sm-10 form-inline">
+                    <label class="radio-inline">
+                        <label for="boy" class="sr-only">Boy</label>
+                        <input type="radio" id="boy" name="gender" value="1" <?php if ($resume_info['gender'] == 1) {
+                            echo "checked";
+                        }?>>男
+                    </label>
+                    <label class="radio-inline">
+                        <label for="girl" class="sr-only">Girl</label>
+                        <input type="radio" id="girl" name="gender" value="0" <?php if (isset($resume_info['gender']) && $resume_info['gender'] == 0) {
+                            echo "checked";
+                        }?> required>女
+                    </label>
+                  </div>                  
+                </div>
+
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">生日</label>
+                    <div class="col-sm-10">
+                      <label for="birthday" class="sr-only">Birthday</label>
+                      <input type="date" class="form-control" id="birthday" name="birthday" value="{$resume_info['birthday']}" style="width:200px" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">籍贯</label>
+                    <div class="col-sm-10 form-inline">
+                     <div class="input-group">
+                      <label for="province" class="sr-only">Province</label>
+                      <input type="text" class="form-control" id="province" name="province" value="{$resume_info['province']}" placeholder="如: 广东" required>
+                      <span class="input-group-addon">省</span>
+
+                      <label for="city" class="sr-only">City</label>
+                      <input type="text" class="form-control" id="city" name="city" value="{$resume_info['city']}" placeholder="如: 广州" required>
+                      <span class="input-group-addon">市</span>
+                     </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">民族</label>
+                    <div class="col-sm-10 form-inline">
+                     <div class="input-group">
+                      <label for="race" class="sr-only">Race</label>
+                      <input type="text" class="form-control" id="race" name="race" value="{$resume_info['race']}" placeholder="如: 汉" required>
+                      <span class="input-group-addon">族</span>
+                     </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">学院&专业</label>
+                    <div class="col-sm-10 form-inline">
+                     <div class="input-group">
+                      <label for="college" class="sr-only">College</label>
+                      <input type="text" class="form-control" id="college" name="college" value="{$resume_info['college']}" placeholder="学院全称" required>
+                      <span class="input-group-addon">学院</span>
+
+                      <label for="major" class="sr-only">Major</label>
+                      <input type="text" class="form-control" id="major" name="major" value="{$resume_info['major']}" placeholder="专业全称" required>
+                      <span class="input-group-addon">专业</span>
+                     </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">手机号&短号</label>
+                    <div class="col-sm-10 form-inline">
+
+                      <label for="phone" class="sr-only">Phone</label>
+                      <input type="text" class="form-control" id="phone" name="phone" value="{$info['phone']}" placeholder="手机号" required readonly>
+
+                      <label for="short_phone" class="sr-only">ShortPhone</label>
+                      <input type="text" class="form-control" id="short_phone" name="short_phone" value="{$resume_info['short_phone']}" placeholder="短号(可不填)">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">住址</label>
+                    <div class="col-sm-10 form-inline">
+
+                     <div class="input-group">
+                      <label for="district" class="sr-only">District</label>
+                      <select class="form-control" name="district" id="district">
+                        <option value="1" <?php if ($resume_info['district'] == 1) {
+                            echo "selected";
+                        }?>>华山</option>
+                        <option value="2" <?php if ($resume_info['district'] == 2) {
+                            echo "selected";
+                        }?>>燕山</option>
+                        <option value="3" <?php if ($resume_info['district'] == 3) {
+                            echo "selected";
+                        }?>>泰山</option>
+                        <option value="4" <?php if ($resume_info['district'] == 4) {
+                            echo "selected";
+                        }?>>启林南</option>
+                        <option value="5" <?php if ($resume_info['district'] == 5) {
+                            echo "selected";
+                        }?>>启林北</option>
+                      </select>
+                      <span class="input-group-addon">区</span>
+                     </div>
+                    </div>
+
+                    <div class="col-sm-offset-2 col-sm-10 form-inline">
+
+                     <div class="input-group">
+                      <label for="building" class="sr-only">Building</label>
+                      <input type="text" class="form-control" id="building" name="building" value="{$resume_info['building']}" placeholder="如: 10" required>
+                      <span class="input-group-addon">栋</span>
+
+                      <label for="room" class="sr-only">Room</label>
+                      <input type="text" class="form-control" id="room" name="room" value="{$resume_info['room']}" placeholder="如: 101" required>
+                      <span class="input-group-addon">房</span>
+                     </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">意向工作校区</label>
+                    <div class="col-sm-10 form-inline">
+
+                     <div class="input-group">
+                      <label for="willing_district" class="sr-only">Willing-district</label>
+                      <select class="form-control" name="willing_district" id="willing_district">
+                        <option value="1" <?php if ($resume_info['willing_district'] == 1) {
+                            echo "selected";
+                        }?>>华山</option>
+                        <option value="2" <?php if ($resume_info['willing_district'] == 2) {
+                            echo "selected";
+                        }?>>燕山</option>
+                        <option value="3" <?php if ($resume_info['willing_district'] == 3) {
+                            echo "selected";
+                        }?>>泰山</option>
+                        <option value="4" <?php if ($resume_info['willing_district'] == 4) {
+                            echo "selected";
+                        }?>>启林南</option>
+                        <option value="5" <?php if ($resume_info['willing_district'] == 5) {
+                            echo "selected";
+                        }?>>启林北</option>
+                      </select>
+                      <span class="input-group-addon">区</span>
+                     </div>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">是否服从调配</label>
+                  <div class="col-sm-10">
+                    <label class="radio-inline">
+                        <label for="yes" class="sr-only">Yes</label>
+                        <input type="radio" id="yes" name="accept_deploy" value="1" <?php if ($resume_info['accept_deploy'] == 1) {
+                            echo "checked";
+                        }?>>是
+                    </label>
+                    <label class="radio-inline">
+                        <label for="no" class="sr-only">No</label>
+                        <input type="radio" id="no" name="accept_deploy" value="0" <?php if (isset($resume_info['accept_deploy']) && $resume_info['accept_deploy'] == 0) {
+                            echo "checked";
+                        }?> required>否
+                    </label>
+                  </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">晚上空闲时间 / 周</label>
+                    <div class="col-sm-10">
+                      <label class="checkbox-inline">
+                        <input type="checkbox" id="inlineCheckbox1" name="free_time[]" value="1" <?php if (in_array("1", $resume_info['free_time'])) {
+                            echo "checked";
+                        }?>>周一
+                      </label>
+                      <label class="checkbox-inline">
+                        <input type="checkbox" id="inlineCheckbox2" name="free_time[]" value="2" <?php if (in_array("2", $resume_info['free_time'])) {
+                            echo "checked";
+                        }?>>周二
+                      </label>
+                      <label class="checkbox-inline">
+                        <input type="checkbox" id="inlineCheckbox3" name="free_time[]" value="3" <?php if (in_array("3", $resume_info['free_time'])) {
+                            echo "checked";
+                        }?>>周三
+                      </label>
+                      <label class="checkbox-inline">
+                        <input type="checkbox" id="inlineCheckbox4" name="free_time[]" value="4" <?php if (in_array("4", $resume_info['free_time'])) {
+                            echo "checked";
+                        }?>>周四
+                      </label>
+                      <label class="checkbox-inline">
+                        <input type="checkbox" id="inlineCheckbox5" name="free_time[]" value="5" <?php if (in_array("5", $resume_info['free_time'])) {
+                            echo "checked";
+                        }?>>周五
+                      </label>
+                      <label class="checkbox-inline">
+                        <input type="checkbox" id="inlineCheckbox6" name="free_time[]" value="6" <?php if (in_array("6", $resume_info['free_time'])) {
+                            echo "checked";
+                        }?>>周六
+                      </label>
+                      <label class="checkbox-inline">
+                        <input type="checkbox" id="inlineCheckbox7" name="free_time[]" value="7" <?php if (in_array("7", $resume_info['free_time'])) {
+                            echo "checked";
+                        }?>>周日
+                      </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">爱好特长</label>
+                    <div class="col-sm-10">
+                      <label for="hobbies_n_expertise" class="sr-only">Hobbies_n_expertise</label>
+                      <textarea class="form-control" name="hobbies_n_expertise" id="hobbies_n_expertise" rows="3" placeholder="必填" required>{$resume_info['hobbies_n_expertise']}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">加入我们的原因</label>
+                    <div class="col-sm-10">
+                      <label for="reason" class="sr-only">Reason</label>
+                      <textarea class="form-control" name="reason" id="reason" rows="3" placeholder="必填" required>{$resume_info['reason']}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">计算机、网络的熟练程度</label>
+                    <div class="col-sm-10">
+                      <label for="skill_level" class="sr-only">Skill_level</label>
+                      <textarea class="form-control" name="skill_level" id="skill_level" rows="3" placeholder="必填" required>{$resume_info['skill_level']}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">已加入的组织</label>
+                    <div class="col-sm-10">
+                      <label for="joined_group" class="sr-only">Joined_group</label>
+                      <textarea class="form-control" name="joined_group" id="joined_group" rows="3" placeholder="必填" required>{$resume_info['joined_group']}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">自我评价及其它情况说明</label>
+                    <div class="col-sm-10">
+                      <label for="self_assessment" class="sr-only">Self_assessment</label>
+                      <textarea class="form-control" name="self_assessment" id="self_assessment" rows="3" placeholder="必填" required>{$resume_info['self_assessment']}</textarea>
+                    </div>
+                </div>
+            </form>
+          </div>
+        </fieldset>
+                      
+                  <a class="center-block btn btn-default" onclick='$("#stu-{$info['stu_id']}-content").collapse("hide");'>点此折叠</a>
+                </div>
+              </div>
+            </div>
+           </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+</body>
+</html>
