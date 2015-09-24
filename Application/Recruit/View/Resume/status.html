@@ -41,13 +41,16 @@
                 }
             ?>
             <h4 class="text-center {$text_color}">{$handle_rst['status_text']}</h4>
+            <empty name="handle_rst">
+                <h4 class="text-center text-danger">未投递简历(已截止)</h4>
+            </empty>
           </div>
 
           <div class="container-fluid">
            <div class="accordion" id="stu-{$info['stu_id']}">
             <div class="accordion-group">
               <div class="accordion-heading">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#stu-{$info['stu_id']}" href="#stu-{$info['stu_id']}-content">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#stu-{$info['stu_id']}" href="#stu-{$info['stu_id']}-content" style="text-decoration:none;">
 
           <div class="modal-header">
               <h3 class="text-center text-primary">您的简历</h3>
