@@ -5,6 +5,8 @@ class CommonController extends Controller {
 /**
  * 总控制器，直接继承Controller
  */
+	const SESSION_EXPIRE_USER_DEFINED	=	3600;// 自定义session过期时间间隔，秒
+
 	const RECRUIT_STAGE_0_INFO		= "简历投递阶段";
 	const RECRUIT_STAGE_1_INFO		= "简历筛选阶段";
 	const RECRUIT_STAGE_2_INFO		= "面试阶段";
