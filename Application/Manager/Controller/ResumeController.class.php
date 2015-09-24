@@ -203,6 +203,10 @@ class ResumeController extends BaseController {
         // var_dump(strrchr($old_handle_data['status_text'], '简历筛选(通过)'));
         // die;
 
+        // var_dump(U('Manager/Resume/lists'));
+        // var_dump($_SERVER['HTTP_REFERER']);
+        // var_dump($this->success(self::TEXT_CV_PASS."，处理成功！", $_SERVER['HTTP_REFERER'], 5));
+        // die;
         if (strrchr($old_handle_data['status_text'], self::TEXT_CV_PASS) == '') {// 防止重复添加状态
             $handle['status_text'] = $old_handle_data['status_text']." -> ".self::TEXT_CV_PASS;
         }
@@ -210,9 +214,11 @@ class ResumeController extends BaseController {
 
         // var_dump($rst);
         // die;
+         
 
         if ($rst) {
-            $this->success(self::TEXT_CV_PASS."，处理成功！", U('Manager/Resume/lists').(isset($_SERVER['HTTP_REFERER']) ? '?'.end(explode('?', $_SERVER['HTTP_REFERER'])) : ''));
+            /*U('Manager/Resume/lists').(isset($_SERVER['HTTP_REFERER']) ? '?'.end(explode('?', $_SERVER['HTTP_REFERER'])) : '')*/
+            $this->success(self::TEXT_CV_PASS."，处理成功！", $_SERVER['HTTP_REFERER']);
         }else{
             $this->error(self::TEXT_CV_PASS."，处理失败！");
         }
@@ -304,7 +310,7 @@ class ResumeController extends BaseController {
         $rst = $model->save($handle);
 
         if ($rst) {
-            $this->success(self::TEXT_CV_FAIL."，处理成功！", U('Manager/Resume/lists').(isset($_SERVER['HTTP_REFERER']) ? '?'.end(explode('?', $_SERVER['HTTP_REFERER'])) : ''));
+            $this->success(self::TEXT_CV_FAIL."，处理成功！", $_SERVER['HTTP_REFERER']);
         }else{
             $this->error(self::TEXT_CV_FAIL."，处理失败！");
         }
@@ -410,7 +416,7 @@ class ResumeController extends BaseController {
         $rst = $model->save($handle);
 
         if ($rst) {
-            $this->success($tip."，处理成功！", U('Manager/Resume/lists').(isset($_SERVER['HTTP_REFERER']) ? '?'.end(explode('?', $_SERVER['HTTP_REFERER'])) : ''));
+            $this->success($tip."，处理成功！", $_SERVER['HTTP_REFERER']);
         }else{
             $this->error($tip."，处理失败！");
         }
@@ -465,7 +471,7 @@ class ResumeController extends BaseController {
         $rst = $model->save($handle);
 
         if ($rst) {
-            $this->success("面试评价，处理成功！", U('Manager/Resume/lists').(isset($_SERVER['HTTP_REFERER']) ? '?'.end(explode('?', $_SERVER['HTTP_REFERER'])) : ''));
+            $this->success("面试评价，处理成功！", $_SERVER['HTTP_REFERER']);
         }else{
             $this->error("面试评价，处理失败！");
         }
@@ -543,7 +549,7 @@ class ResumeController extends BaseController {
         $rst = $model->save($handle);
 
         if ($rst) {
-            $this->success($tip."，处理成功！", U('Manager/Resume/lists').(isset($_SERVER['HTTP_REFERER']) ? '?'.end(explode('?', $_SERVER['HTTP_REFERER'])) : ''));
+            $this->success($tip."，处理成功！", $_SERVER['HTTP_REFERER']);
         }else{
             $this->error($tip."，处理失败！");
         }
@@ -595,7 +601,7 @@ class ResumeController extends BaseController {
         $rst = $model->save($handle);
 
         if ($rst) {
-            $this->success("实习评价，处理成功！", U('Manager/Resume/lists').(isset($_SERVER['HTTP_REFERER']) ? '?'.end(explode('?', $_SERVER['HTTP_REFERER'])) : ''));
+            $this->success("实习评价，处理成功！", $_SERVER['HTTP_REFERER']);
         }else{
             $this->error("实习评价，处理失败！");
         }
