@@ -111,6 +111,7 @@ class ResumeController extends BaseController {
     				
     				session("RESUME_INFO",null);
     				session("RESUME_LOGIN_FLAG",null);
+                    session('RESUME_EXPIRE', null);
 
     				$this->error($log['status_msg']);
     				break;
@@ -118,6 +119,7 @@ class ResumeController extends BaseController {
     				
     				session("RESUME_INFO", $info);
                     session('RESUME_LOGIN_FLAG', true);
+                    session('RESUME_EXPIRE', NOW_TIME);
 
     				if (isset($resume)) {
     					// 将老用户简历信息转换成表单数据，并写cookie
