@@ -51,6 +51,7 @@ class UserController extends BaseController {
 
     				session('MANAGER_INFO', null);
     				session('MANAGER_LOGIN_FLAG', null);
+                    session('MANAGER_EXPIRE', null);
 
     				$this->error("此账号目前关闭！");
 
@@ -61,7 +62,8 @@ class UserController extends BaseController {
     				$info['d_name'] = $user_data['district_name'];
     				// 通过验证，合法，写session
 					session("MANAGER_INFO", $info);
-	                session('MANAGER_LOGIN_FLAG', true);
+                    session('MANAGER_LOGIN_FLAG', true);
+	                session('MANAGER_EXPIRE', NOW_TIME);
     				
     				$this->success('登录成功！', U('Manager/Resume/lists'));
 
