@@ -41,6 +41,9 @@
                 }
             ?>
             <h4 class="text-center {$text_color}">{$handle_rst['status_text']}</h4>
+            <empty name="handle_rst">
+                <h4 class="text-center text-danger">未投递简历(已截止)</h4>
+            </empty>
           </div>
 
           <div class="container-fluid">
