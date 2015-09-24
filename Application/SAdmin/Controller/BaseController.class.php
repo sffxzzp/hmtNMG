@@ -5,7 +5,8 @@ class BaseController extends CommonController {
 /**
  * 项目总控制器，直接继承CommonController
  */
-    public function index(){
+
+    protected function _initialize(){
     	echo "BaseController";
     }
 }
