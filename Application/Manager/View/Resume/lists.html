@@ -103,7 +103,77 @@
                 
                 <div id="stu-{$one['stu_id']}-content" class="accordion-body collapse" style="height: 0px; ">
                   <div class="accordion-inner">
-                    
+                    <fieldset>
+                <?php
+                  $cur_stage = Manager\Controller\BaseController::$RECRUIT_STAGE;
+                  if ($cur_stage >= 2) {/*面试阶段*/
+                    // 面试评价框
+                    // 如果已有评价，disabled
+                    $interview_comment_url = U('Manager/Resume/interview_comment').'?id='.$one['cv_id'];
+                    ?>
+
+                        <form id="interview-comment-form" class="form-horizontal center-block" <?php echo 'action="'.$interview_comment_url.'"'?> method="post">
+
+                      <?php
+                        if ($one['interview_comment'] == '') {/*允许提交面试评价*/
+                        ?>
+
+                          <div class="form-group">
+                              <label for="" class="col-sm-2 control-label">面试评价</label>
+                              <div class="col-sm-10">
+                                <label for="" class="sr-only">interview_comment</label>
+                                <textarea class="form-control" name="interview_comment" id="" rows="5" placeholder="面试评价(仅可成功提交1次)&#10;&#10;参考内容:&#10;面试者态度、交流沟通能力、相关专业技能、空闲时间、给你的感觉等" ></textarea>
+                              </div>
+                          </div>
+                          <div class="form-group">
+                              <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-primary">面试评价</button>
+                              </div>
+                          </div>
+
+                        <?php
+                        }else{/*已存在面试评价，不允许提交新的评价*/
+                        ?>
+
+                          <div class="form-group">
+                              <label for="" class="col-sm-2 control-label">面试评价</label>
+                              <div class="col-sm-10">
+                                <label for="" class="sr-only">interview_comment</label>
+                                <textarea class="form-control" name="interview_comment" id="" rows="5" placeholder="面试评价(仅可成功提交1次)&#10;&#10;参考内容:&#10;面试者态度、交流沟通能力、相关专业技能、空闲时间、给你的感觉等" disabled><?php echo $one['interview_comment'];?></textarea>
+                              </div>
+                          </div>
+
+                        <?php
+                        }
+                      ?>
+                        </form>
+                  
+                    <?php
+                    if ($cur_stage == 3) {/* 实习阶段*/
+                      // 实习评价框
+                      $internship_comment_url = U('Manager/Resume/internship_comment').'?id='.$one['cv_id'];
+                    ?>
+
+                        <form id="internship-comment-form" class="form-horizontal center-block" <?php echo 'action="'.$internship_comment_url.'"'?> method="post">
+                          <div class="form-group">
+                              <label for="" class="col-sm-2 control-label">实习评价</label>
+                              <div class="col-sm-10">
+                                <label for="" class="sr-only">internship_comment</label>
+                                <textarea class="form-control" name="internship_comment" id="" rows="5" placeholder="实习评价(可多次评价)&#10;&#10;参考内容:&#10;实习生学习能力、态度、待人接物等" ><?php echo $one['internship_comment'];?></textarea>
+                              </div>
+                          </div>
+                          <div class="form-group">
+                              <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-primary">实习评价</button>
+                              </div>
+                          </div>
+                        </form>
+
+                    <?php
+                    }
+                  }
+                ?>
+                    </fieldset>
                     <fieldset disabled>
                         <form id="resume-form" class="form-horizontal center-block" action="" method="post">
                             <div class="form-group">
