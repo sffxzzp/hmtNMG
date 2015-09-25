@@ -225,6 +225,12 @@ Application/Common/Conf/config.php
 # 忽略Recruit的数据库配置文件
 Application/Recruit/Conf/config.php
 
+# 忽略Manager的数据库配置文件
+Application/Manager/Conf/config.php
+
+# 忽略SAdmin的数据库配置文件
+Application/SAdmin/Conf/config.php
+
 # 忽略Recruit的简历照片
 Application/Recruit/Source/images/photo/*.jpg
 Application/Recruit/Source/images/photo/*.jpeg
