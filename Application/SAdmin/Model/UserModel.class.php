@@ -1,5 +1,5 @@
 <?php
-namespace SAdmin\Model;
+namespace Sadmin\Model;
 use Think\Model;
 class UserModel extends BaseModel {
 /**

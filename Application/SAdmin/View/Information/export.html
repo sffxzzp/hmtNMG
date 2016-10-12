@@ -1,0 +1,141 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		<title>管理面板</title>
+		<?php $SRC = SADMIN_SRC;?>
+		<script type="text/javascript" src="{$SRC}/scripts/jquery.min.js"></script>
+		<script type="text/javascript" src="{$SRC}/scripts/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="{$SRC}/css/bootstrap.min.css">
+		<style>
+			body{
+				font-family: 'microsoft yahei',Arial,sans-serif;
+				margin:0;
+				padding:0;
+			}
+			.is-Overflow {
+				overflow: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				function getData(type) {
+					$.ajax({
+						type: 'post',
+						url: location.href,
+						dataType: 'json',
+						timeout: 15000,
+						data: {"type": type},
+						success: function(result) {
+							if (result != null) {
+								if (type == "resume") {
+									var csvtxt = '\uFEFFcv_id,stu_id,name,photo,gender,birthday,birth_place,race,college,major,phone,short_phone,address,willing_district,accept_deploy,free_time,hobbies_n_expertise,reason,skill_level,joined_group,self_assessment,cTime,lastEditTime,cv_flag,\n简历id,学号,姓名,照片名,性别,生日,籍贯,民族,学院,专业,手机号,短号,地址,意向工作校区(1华山，2燕山，3泰山，4启林南，5启林北),是否接受调配(1接受，0不接受),每周晚空闲时间,爱好和特长,加入网维组的原因,计算机、网络技能熟练程度,已加入的组织,自我评价,创建时间,最后一次编辑时间,简历标识,\n\n';
+									for (var i = 0; i < result.length; i++) {
+										csvtxt += result[i].cv_id+','+result[i].stu_id+','+result[i].name+','+result[i].photo+','+result[i].gender+','+result[i].birthday+','+result[i].birth_place+','+result[i].race+','+result[i].college+','+result[i].major+','+result[i].phone+','+result[i].short_phone+','+result[i].address+','+result[i].willing_district+','+result[i].accept_deploy+','+result[i].free_time.replace(/,/g, "|")+','+result[i].hobbies_n_expertise.replace(/\r*\n/g, "|")+','+result[i].reason.replace(/\r*\n/g, "|")+','+result[i].skill_level.replace(/\r*\n/g, "|")+','+result[i].joined_group.replace(/\r*\n/g, "|")+','+result[i].self_assessment.replace(/\r*\n/g, "|")+','+result[i].cTime+','+result[i].lastEditTime+','+result[i].cv_flag+'\n';
+									}
+									csvtxt = encodeURIComponent(csvtxt);
+									var downLink = document.getElementById('download_link');
+									downLink.setAttribute('href', 'data:text/csv;charset=utf-8,'+csvtxt);
+									downLink.setAttribute('download', 'export_resume.csv');
+									downLink.click();
+								}
+								else if (type == "handle") {
+									var csvtxt = '\uFEFFcv_id,district_1,district_2,district_3,district_4,district_5,last_rst_district,status_text,interview_comment,internship_comment,\n简历id,华山处理状态,燕山处理状态,泰山处理状态,启林北处理状态,启林南处理状态,最后接收应聘者区域,招聘过程记录,面试评价,实习评价,\n\n';
+									for (var i = 0; i < result.length; i++) {
+										interview_comment = (result[i].interview_comment != null)?result[i].interview_comment.replace(/\r*\n/g, "|"):'无';
+										internship_comment = (result[i].internship_comment != null)?result[i].internship_comment.replace(/\r*\n/g, "|"):'无';
+										csvtxt += result[i].cv_id+','+result[i].district_1+','+result[i].district_2+','+result[i].district_3+','+result[i].district_4+','+result[i].district_5+','+result[i].last_rst_district+','+result[i].status_text+','+interview_comment+','+internship_comment+'\n';
+									}
+									csvtxt = encodeURIComponent(csvtxt);
+									var downLink = document.getElementById('download_link');
+									downLink.setAttribute('href', 'data:text/csv;charset=utf-8,'+csvtxt);
+									downLink.setAttribute('download', 'export_resume_handle.csv');
+									downLink.click();
+								}
+								else if (type == "log") {
+									var csvtxt = '\uFEFFlog_id,stu_id,phone,cv_flag,ip,cTime,status,status_msg\n日志id,学号,手机号,简历id,登录ip,登录时间,登录状态,登录状态信息\n\n';
+									for (var i = 0; i < result.length; i++) {
+										csvtxt += result[i].log_id+','+result[i].stu_id+','+result[i].phone+','+result[i].cv_flag+','+result[i].ip+','+result[i].cTime+','+result[i].status+','+result[i].status_msg+'\n';
+									}
+									csvtxt = encodeURIComponent(csvtxt);
+									var downLink = document.getElementById('download_link');
+									downLink.setAttribute('href', 'data:text/csv;charset=utf-8,'+csvtxt);
+									downLink.setAttribute('download', 'export_resume_login_log.csv');
+									downLink.click();
+								}
+							}
+							else {
+								$('#msg').html('表中无任何内容！');
+							}
+						},
+						error: function(XMLHttpRequest,status) {
+							if (status == 'timeout') {
+					            $("#msg").html('请求超时！');
+					        } else {
+					            $("#msg").html('无法请求数据！');
+					        }
+						}
+					});
+				}
+				$('#export_resume').click(function(){getData('resume')});
+				$('#export_handle').click(function(){getData('handle')});
+				$('#export_log').click(function(){getData('log')});
+			});
+		</script>
+		<div class="container-fluid">
+			<nav class="navbar navbar-inverse navbar-fixed-top">
+				<div class="container-fluid">
+					<div class="navbar-header">
+						<a class="navbar-brand" href="#"><b>管理界面</b></a>
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-6">
+							<span class="sr-only">导航</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+					</div>
+					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-6">
+						<ul class="nav navbar-nav">
+							<?php 
+								$jlclqk = U('Sadmin/Candidate/cv_status');
+								$gbzpjd = U('Sadmin/Environment/change_stage');
+								$bfsj = U('Sadmin/Environment/bk_DB');
+								$dcjlxx = U('Sadmin/Information/export');
+								$ypzdlrz = U('Sadmin/Candidate/login_log');
+								$czglymm = U('Sadmin/District/reset_pwd');
+								$zpxxcz = U('Sadmin/Environment/onekey_init');
+								$exit = U('Manager/User/quit');
+							?>
+							<li><a href="{$jlclqk}"><i class="icon-chevron-right"></i>简历处理情况</a></li>
+							<li><a href="{$gbzpjd}"><i class="icon-chevron-right"></i>改变招聘阶段</a></li>
+							<li><a href="{$bfsj}"><i class="icon-chevron-right"></i>备份数据</a></li>
+							<li class="active"><a href="{$dcjlxx}"><i class="icon-chevron-right"></i>导出简历信息</a></li>
+							<li><a href="{$ypzdlrz}"><i class="icon-chevron-right"></i>应聘者登录日志</a></li>
+							<li><a href="{$czglymm}"><i class="icon-chevron-right"></i>重置管理员密码</a></li>
+							<li><a href="{$zpxxcz}"><i class="icon-chevron-right"></i>招聘信息重置</a></li>
+						</ul>
+						<ul class="nav navbar-nav navbar-right">
+							<li><a href="{$exit}">退出</a></li>
+						</ul>
+					</div>
+				</div>
+			</nav>
+			<br>
+			<div class="container theme-showcase" role="main" style="height:100%">
+				<div class="jumbotron"><br>
+					<p id="msg">导出格式为csv格式，可使用Excel打开。</p>
+					<center>
+						<div class="btn-group">
+					 		<button id="export_resume" class="btn btn-default" type="button">导出简历</button>
+						 	<button id="export_handle" class="btn btn-default" type="button">导出简历处理情况</button>
+						 	<button id="export_log" class="btn btn-default" type="button">导出应聘者登录日志</button>
+						</div>
+					</center>
+					<a id="download_link" style="display:none;" download="downlaod.csv" href="#">Download</a>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

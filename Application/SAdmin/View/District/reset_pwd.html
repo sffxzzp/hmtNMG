@@ -1,0 +1,104 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		<title>管理面板</title>
+		<?php $SRC = SADMIN_SRC;?>
+		<script type="text/javascript" src="{$SRC}/scripts/jquery.min.js"></script>
+		<script type="text/javascript" src="{$SRC}/scripts/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="{$SRC}/css/bootstrap.min.css">
+		<style>
+			body{
+				font-family: 'microsoft yahei',Arial,sans-serif;
+				margin:0;
+				padding:0;
+			}
+			.is-Overflow {
+				overflow: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+			function changeTarget(targetid) {
+				document.getElementById('target_admin').setAttribute('value', targetid);
+			}
+			function formSubmit() {
+				var new_pwd = document.reset_pwd.new_pwd.value;
+				var new_pwd_repeat = document.reset_pwd.new_pwd_repeat.value;
+				if (new_pwd == new_pwd_repeat) {
+					document.getElementById('reset_pwd').submit();
+				}
+				else {
+					alert('两次输入的密码不同，请检查后重试。');
+				}
+			}
+		</script>
+		<div class="container-fluid">
+			<nav class="navbar navbar-inverse navbar-fixed-top">
+	            <div class="container-fluid">
+	                <div class="navbar-header">
+	                    <a class="navbar-brand" href="#"><b>管理界面</b></a>
+	                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-6">
+	                        <span class="sr-only">导航</span>
+	                        <span class="icon-bar"></span>
+	                        <span class="icon-bar"></span>
+	                        <span class="icon-bar"></span>
+	                    </button>
+	                </div>
+	                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-6">
+	                    <ul class="nav navbar-nav">
+							<?php 
+								$jlclqk = U('Sadmin/Candidate/cv_status');
+								$gbzpjd = U('Sadmin/Environment/change_stage');
+								$bfsj = U('Sadmin/Environment/bk_DB');
+								$dcjlxx = U('Sadmin/Information/export');
+								$ypzdlrz = U('Sadmin/Candidate/login_log');
+								$czglymm = U('Sadmin/District/reset_pwd');
+								$zpxxcz = U('Sadmin/Environment/onekey_init');
+								$exit = U('Manager/User/quit');
+							?>
+							<li><a href="{$jlclqk}"><i class="icon-chevron-right"></i>简历处理情况</a></li>
+							<li><a href="{$gbzpjd}"><i class="icon-chevron-right"></i>改变招聘阶段</a></li>
+							<li><a href="{$bfsj}"><i class="icon-chevron-right"></i>备份数据</a></li>
+							<li><a href="{$dcjlxx}"><i class="icon-chevron-right"></i>导出简历信息</a></li>
+							<li><a href="{$ypzdlrz}"><i class="icon-chevron-right"></i>应聘者登录日志</a></li>
+							<li class="active"><a href="{$czglymm}"><i class="icon-chevron-right"></i>重置管理员密码</a></li>
+							<li><a href="{$zpxxcz}"><i class="icon-chevron-right"></i>招聘信息重置</a></li>
+	                    </ul>
+	                    <ul class="nav navbar-nav navbar-right">
+							<li><a href="{$exit}">退出</a></li>
+						</ul>
+	                </div>
+	            </div>
+	        </nav>
+	        <br>
+	        <div class="container theme-showcase" role="main" style="height:100%">
+	            <div class="jumbotron"><br>
+	            	<h4 style="color:red;">{$success}</h2>
+	            	<div class="tabbable">
+						<ul class="nav nav-tabs">
+							<li class="active"><a onclick="changeTarget(1)" data-toggle="tab">华山</a></li>
+							<li><a onclick="changeTarget(2)" data-toggle="tab">燕山</a></li>
+							<li><a onclick="changeTarget(3)" data-toggle="tab">泰山</a></li>
+							<li><a onclick="changeTarget(4)" data-toggle="tab">启林南</a></li>
+							<li><a onclick="changeTarget(5)" data-toggle="tab">启林北</a></li>
+							<li><a onclick="changeTarget(9)" data-toggle="tab">总负</a></li>
+						</ul>
+						<div class="tab-content">
+							<form id="reset_pwd" name="reset_pwd" class="form" action="{$czglymm}" method="post">
+								<div class="form-group">
+									<input type="hidden" id="target_admin" name="target_admin" value="1" />
+									<input class="form-control" id="new_pwd" type="password" name="new_pwd" placeholder="新密码" />
+									<input class="form-control" id="new_pwd_repeat" type="password" name="new_pwd_repeat" placeholder="确认新密码" />
+									<input class="form-control" type="password" name="verify_pwd" placeholder="请输入当前总负密码" /><br>
+									<input class="btn btn-primary" type="button" onclick="formSubmit()" value="提交" />
+								</div>
+							</form>
+						</div>
+					</div>
+	            </div>
+	        </div>
+		</div>
+	</body>
+</html>

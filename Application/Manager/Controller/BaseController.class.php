@@ -123,7 +123,7 @@ class BaseController extends CommonController {
 			
 			if (session('MANAGER_LOGIN_FLAG')) {
 				// 重复登录，跳转到主页
-				$this->error("您已经登录！", U('Manager/Resume/lists'), 1);
+				$this->error("您已经登录！", U('Manager/Resume/index'), 1);
 				
 				// 更新销毁session时间
 				session('MANAGER_EXPIRE', NOW_TIME);

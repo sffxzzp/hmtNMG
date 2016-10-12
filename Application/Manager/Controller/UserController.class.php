@@ -65,7 +65,7 @@ class UserController extends BaseController {
                     session('MANAGER_LOGIN_FLAG', true);
 	                session('MANAGER_EXPIRE', NOW_TIME);
     				
-    				$this->success('登录成功！', U('Manager/Resume/lists'));
+    				$this->success('登录成功！', U('Manager/Resume/index'));
 
     				break;
     			

@@ -1,6 +1,6 @@
 <?php
 /**
- * SAdmin公共函数
+ * Sadmin公共函数
  */
 
 ?>

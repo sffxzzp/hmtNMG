@@ -1,5 +1,5 @@
 <?php
-namespace SAdmin\Model;
+namespace Sadmin\Model;
 use Common\Model\CommonModel;
 class BaseModel extends CommonModel {
 /**

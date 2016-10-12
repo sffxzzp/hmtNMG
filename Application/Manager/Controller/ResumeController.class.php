@@ -20,7 +20,13 @@ class ResumeController extends BaseController {
 
 
     public function index(){
-        echo "Resume控制器";
+        $info = session('MANAGER_INFO');
+        if ($info['d_ID'] == 9) {// 总负责人
+            redirect(U('Sadmin/Candidate/cv_status'));
+        }
+        else {//非总负责人
+            redirect(U('Manager/Resume/lists'));
+        }
     }
 
     /**
