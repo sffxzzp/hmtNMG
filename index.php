@@ -1,6 +1,6 @@
 <?php
 
-	define('APP_DEBUG', false);// 开启调试，上线前须关闭
+	define('APP_DEBUG', true);// 开启调试，上线前须关闭
     //---------------------
     //SQL信息需要修改多次。分别位于Application下各文件夹下的Conf目录中。
     //---------------------
